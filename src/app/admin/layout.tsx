@@ -188,9 +188,15 @@ export default function AdminLayout({
             </a>
             <a
               href="/admin/ai-generator"
-              className="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+              className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
             >
               AI Generator
+            </a>
+            <a
+              href="/admin/images"
+              className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+            >
+              Images
             </a>
           </div>
         </div>
