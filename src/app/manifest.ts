@@ -2,32 +2,29 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'FreeImage - AI Generated Images',
-    short_name: 'FreeImage',
-    description: 'Discover thousands of stunning, high-quality AI-generated images. Perfect for your projects, completely free, and ready for commercial use.',
+    name: 'ImageGenFree - Free AI Generated Images',
+    short_name: 'ImageGenFree',
+    description: 'Download thousands of stunning AI-generated images for free. Perfect for websites, marketing, social media, and commercial projects.',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
     theme_color: '#2563eb',
     icons: [
       {
-        src: '/favicon.ico',
-        sizes: 'any',
-        type: 'image/x-icon',
-      },
-      {
-        src: '/icon-192.png',
+        src: '/icon-192x192.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/icon-512.png',
+        src: '/icon-512x512.png',
         sizes: '512x512',
         type: 'image/png',
       },
     ],
-    categories: ['photography', 'graphics', 'design'],
+    categories: ['photography', 'design', 'productivity'],
     lang: 'en',
     orientation: 'portrait-primary',
+    scope: '/',
+    id: 'com.imagegenfree.app',
   }
 } 

@@ -13,7 +13,7 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="text-xl font-bold">FreeImage</span>
+              <span className="text-xl font-bold">ImageGenFree</span>
             </div>
             <p className="text-gray-300 mb-4 max-w-md">
               Discover thousands of stunning AI-generated images. Free to download and use for personal and commercial projects.
@@ -79,7 +79,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-8 mt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              <p>© {new Date().getFullYear()} FreeImage. All rights reserved.</p>
+              <p>© {new Date().getFullYear()} ImageGenFree. All rights reserved.</p>
               <p className="mt-1">
                 Images generated using AI technology. Not affiliated with any specific AI company.
               </p>

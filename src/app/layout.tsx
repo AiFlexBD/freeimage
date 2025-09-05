@@ -9,46 +9,54 @@ import FluentLaneAd from '@/components/FluentLaneAd'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://imagegenfree.com'),
   title: {
-    template: '%s | FreeImage - AI Generated Images',
-    default: 'FreeImage - Free AI Generated Images for Commercial Use'
+    default: 'ImageGenFree - Free AI Generated Images for Commercial Use',
+    template: '%s | ImageGenFree'
   },
-  description: 'Discover thousands of stunning, high-quality AI-generated images. Perfect for your projects, completely free, and ready for commercial use. Browse categories like nature, business, technology, and more.',
-  keywords: ['free images', 'AI generated images', 'stock photos', 'commercial use', 'royalty free', 'artificial intelligence', 'photography', 'graphics', 'design resources'],
-  authors: [{ name: 'FreeImage Team' }],
-  creator: 'FreeImage',
-  publisher: 'FreeImage',
+  description: 'Download thousands of stunning AI-generated images for free. Perfect for websites, marketing, social media, and commercial projects. No attribution required.',
+  keywords: [
+    'free AI images',
+    'AI generated images',
+    'royalty free images',
+    'commercial use images',
+    'free stock photos',
+    'AI art',
+    'artificial intelligence images',
+    'free download images',
+    'ImageGenFree',
+    'no attribution required'
+  ],
+  authors: [{ name: 'ImageGenFree' }],
+  creator: 'ImageGenFree',
+  publisher: 'ImageGenFree',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: '/',
-    title: 'FreeImage - Free AI Generated Images for Commercial Use',
-    description: 'Discover thousands of stunning, high-quality AI-generated images. Perfect for your projects, completely free, and ready for commercial use.',
-    siteName: 'FreeImage',
+    url: 'https://imagegenfree.com',
+    siteName: 'ImageGenFree',
+    title: 'ImageGenFree - Free AI Generated Images for Commercial Use',
+    description: 'Download thousands of stunning AI-generated images for free. Perfect for websites, marketing, social media, and commercial projects.',
     images: [
       {
-        url: '/og-image.jpg',
+        url: 'https://imagegenfree.com/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'FreeImage - AI Generated Images',
+        alt: 'ImageGenFree - Free AI Generated Images',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FreeImage - Free AI Generated Images',
-    description: 'Discover thousands of stunning, high-quality AI-generated images for commercial use.',
-    images: ['/og-image.jpg'],
-    creator: '@freeimage',
+    title: 'ImageGenFree - Free AI Generated Images for Commercial Use',
+    description: 'Download thousands of stunning AI-generated images for free. Perfect for websites, marketing, social media, and commercial projects.',
+    images: ['https://imagegenfree.com/og-image.jpg'],
+    creator: '@imagegenfree',
   },
   robots: {
     index: true,
@@ -63,6 +71,9 @@ export const metadata: Metadata = {
   },
   verification: {
     google: 'your-google-verification-code',
+  },
+  alternates: {
+    canonical: 'https://imagegenfree.com',
   },
   category: 'technology',
 }

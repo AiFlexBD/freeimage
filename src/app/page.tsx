@@ -130,11 +130,11 @@ export default function HomePage() {
   if (!heroReady) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/30 border-t-white mx-auto mb-6"></div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight">FreeImage</h1>
-          <p className="text-xl text-white/90">Loading amazing AI images...</p>
-        </div>
+                      <div className="text-center text-white">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/30 border-t-white mx-auto mb-6"></div>
+                <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight">ImageGenFree</h1>
+                <p className="text-xl text-white/90">Loading amazing AI images...</p>
+              </div>
       </div>
     )
   }
