@@ -275,6 +275,60 @@ export default function AIGeneratorPage() {
                 }</p>
               )}
             </div>
+            
+            {/* Token Usage & Cost Information */}
+            {apiResponse.usage && (
+              <div className="mt-4 bg-white rounded-lg p-4 border-l-4 border-blue-500">
+                <h4 className="font-semibold text-gray-900 mb-3">💰 Token Usage & Cost Breakdown</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <h5 className="font-medium text-gray-700 mb-2">📊 Token Usage:</h5>
+                    <div className="space-y-1 text-gray-600">
+                      <p><strong>Input Tokens:</strong> {apiResponse.usage.inputTokens?.toLocaleString() || 0}</p>
+                      <p><strong>Output Tokens:</strong> {apiResponse.usage.outputTokens?.toLocaleString() || 0}</p>
+                      <p><strong>Total Tokens:</strong> {apiResponse.usage.totalTokens?.toLocaleString() || 0}</p>
+                    </div>
+                  </div>
+                  
+                  {apiResponse.costs && (
+                    <div>
+                      <h5 className="font-medium text-gray-700 mb-2">💲 Cost Breakdown:</h5>
+                      <div className="space-y-1 text-gray-600">
+                        <p><strong>Input Cost:</strong> ${apiResponse.costs.inputCost}</p>
+                        <p><strong>Output Cost:</strong> ${apiResponse.costs.outputCost}</p>
+                        <p><strong>Image Cost:</strong> ${apiResponse.costs.imageCost}</p>
+                        <p className="text-green-700 font-semibold"><strong>Total Cost:</strong> ${apiResponse.costs.totalCost}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {apiResponse.costs?.breakdown && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <h5 className="font-medium text-gray-700 mb-2">🧮 Detailed Calculation:</h5>
+                    <div className="text-xs text-gray-500 space-y-1">
+                      <p>{apiResponse.costs.breakdown.input}</p>
+                      <p>{apiResponse.costs.breakdown.output}</p>
+                      <p>{apiResponse.costs.breakdown.images}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {apiResponse.usage.details && apiResponse.usage.details.length > 1 && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <h5 className="font-medium text-gray-700 mb-2">📋 Per-Image Details:</h5>
+                    <div className="text-xs text-gray-500 space-y-1">
+                      {apiResponse.usage.details.map((detail: any, index: number) => (
+                        <p key={index}>
+                          <strong>Image {detail.imageIndex}:</strong> {detail.totalTokens} tokens 
+                          ({detail.promptTokens} input + {detail.candidateTokens} output)
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -439,25 +493,43 @@ export default function AIGeneratorPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               <div>
                 <strong>Standard (1024×1024):</strong><br/>
-                Good for web, social media
+                Good for web, social media<br/>
+                <span className="text-green-600">~$0.039-0.040 per image</span>
               </div>
               <div>
                 <strong>High Quality (1536×1536):</strong><br/>
-                Better detail, good for larger displays
+                Better detail, good for larger displays<br/>
+                <span className="text-green-600">~$0.040-0.041 per image</span>
               </div>
               <div>
                 <strong>Ultra High (2048×2048):</strong><br/>
-                Excellent for print, professional use
+                Excellent for print, professional use<br/>
+                <span className="text-orange-600">~$0.041-0.043 per image</span>
               </div>
               <div>
                 <strong>Maximum (4096×4096):</strong><br/>
-                Print-ready, zoom without pixelation
+                Print-ready, zoom without pixelation<br/>
+                <span className="text-red-600">~$0.043-0.045 per image</span>
               </div>
             </div>
             <p className="text-xs text-gray-600 mt-2">
-              💡 <strong>Tip:</strong> Higher resolutions take longer to generate and create larger files, 
+              💡 <strong>Tip:</strong> Higher resolutions use more tokens (longer prompts) and cost more, 
               but they won't pixelate when zoomed or printed at large sizes.
             </p>
+          </div>
+          
+          <div className="bg-yellow-50 rounded-lg p-4 mt-4 border border-yellow-200">
+            <h4 className="font-semibold text-yellow-800 mb-2">💰 Cost Information (2025 Latest):</h4>
+            <div className="text-sm text-yellow-700 space-y-1">
+              <p><strong>Gemini 2.5 Flash Image Preview Pricing:</strong></p>
+              <p>• Input tokens (text/image): $0.30 per 1M tokens</p>
+              <p>• Image generation: $0.039 per image (up to 1024×1024)</p>
+              <p>• Higher resolutions: Same per-image cost, better quality</p>
+              <p className="mt-2"><strong>Cost factors:</strong> Higher quality = longer prompts = more input tokens</p>
+              <p className="text-xs mt-2 text-yellow-600">
+                <strong>Example:</strong> Generating 1 Ultra High image (~500 tokens prompt) = ~$0.0395 total
+              </p>
+            </div>
           </div>
         </div>
       </div>

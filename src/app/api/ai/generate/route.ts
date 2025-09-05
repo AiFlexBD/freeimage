@@ -8,6 +8,36 @@ const QUALITY_SETTINGS = {
   max: { size: '4096x4096', description: 'maximum quality, professional-grade, ultra-crisp, print-ready' }
 }
 
+// Gemini pricing (2025 latest rates from Google AI Developer docs)
+const GEMINI_PRICING = {
+  // Gemini 2.5 Flash Image Preview pricing (what we're using)
+  inputTokens: 0.0003,     // $0.30 per 1M tokens (text/image)
+  outputTokens: 0.000039,  // $0.039 per image (1290 tokens = $0.039, so ~$30 per 1M tokens)
+  imageGeneration: 0.039   // $0.039 per image (up to 1024x1024px)
+}
+
+// Function to calculate estimated costs
+function calculateCosts(inputTokens: number, outputTokens: number, imageCount: number) {
+  const inputCost = inputTokens * GEMINI_PRICING.inputTokens
+  // For image generation, we use per-image pricing
+  const imageCost = imageCount * GEMINI_PRICING.imageGeneration
+  // Output tokens are minimal for image generation (just metadata)
+  const outputCost = outputTokens * 0.000001 // Minimal cost for output tokens
+  const totalCost = inputCost + outputCost + imageCost
+  
+  return {
+    inputCost: Number(inputCost.toFixed(6)),
+    outputCost: Number(outputCost.toFixed(6)),
+    imageCost: Number(imageCost.toFixed(6)),
+    totalCost: Number(totalCost.toFixed(6)),
+    breakdown: {
+      input: `${inputTokens.toLocaleString()} tokens × $${GEMINI_PRICING.inputTokens}/1M = $${inputCost.toFixed(6)}`,
+      output: `${outputTokens.toLocaleString()} tokens (metadata) = $${outputCost.toFixed(6)}`,
+      images: `${imageCount} image${imageCount !== 1 ? 's' : ''} × $${GEMINI_PRICING.imageGeneration} = $${imageCost.toFixed(6)}`
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { prompt, aspectRatio, quality, count } = await request.json()
@@ -71,6 +101,10 @@ export async function POST(request: NextRequest) {
     // Generate images with Gemini 2.5 Flash Image Preview
     try {
       const generatedImages = []
+      let totalInputTokens = 0
+      let totalOutputTokens = 0
+      let totalCandidateCount = 0
+      const generationDetails = []
       
       for (let i = 0; i < count; i++) {
         // Enhanced prompt with quality and resolution specifications
@@ -115,6 +149,20 @@ Make sure the image is extremely detailed and sharp at the requested resolution.
         const data = await response.json()
         console.log('Gemini response for high-quality image:', JSON.stringify(data, null, 2))
         
+        // Extract usage metadata
+        if (data.usageMetadata) {
+          totalInputTokens += data.usageMetadata.promptTokenCount || 0
+          totalOutputTokens += data.usageMetadata.candidatesTokenCount || 0
+          totalCandidateCount += data.usageMetadata.totalTokenCount || 0
+          
+          generationDetails.push({
+            imageIndex: i + 1,
+            promptTokens: data.usageMetadata.promptTokenCount || 0,
+            candidateTokens: data.usageMetadata.candidatesTokenCount || 0,
+            totalTokens: data.usageMetadata.totalTokenCount || 0
+          })
+        }
+        
         // Extract image from Gemini response
         const candidate = data.candidates?.[0]
         if (candidate?.content?.parts) {
@@ -134,6 +182,9 @@ Make sure the image is extremely detailed and sharp at the requested resolution.
         }
       }
 
+      // Calculate costs
+      const costs = calculateCosts(totalInputTokens, totalOutputTokens, generatedImages.length)
+
       return NextResponse.json({
         success: true,
         images: generatedImages,
@@ -145,6 +196,14 @@ Make sure the image is extremely detailed and sharp at the requested resolution.
           resolution: `${dimensions.width}x${dimensions.height}`,
           qualityDescription: qualityConfig.description
         },
+        usage: {
+          inputTokens: totalInputTokens,
+          outputTokens: totalOutputTokens,
+          totalTokens: totalCandidateCount,
+          imagesGenerated: generatedImages.length,
+          details: generationDetails
+        },
+        costs: costs,
         note: generatedImages.some(img => img.startsWith('data:')) 
           ? `Generated with Gemini 2.5 Flash Image Preview at ${dimensions.width}x${dimensions.height} resolution` 
           : 'Gemini API responded but no images were generated. Using high-resolution placeholders.',
@@ -169,6 +228,24 @@ Make sure the image is extremely detailed and sharp at the requested resolution.
           quality, 
           count,
           resolution: `${dimensions.width}x${dimensions.height}`
+        },
+        usage: {
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+          imagesGenerated: 0,
+          details: []
+        },
+        costs: {
+          inputCost: 0,
+          outputCost: 0,
+          imageCost: 0,
+          totalCost: 0,
+          breakdown: {
+            input: 'API failed - no tokens used',
+            output: 'API failed - no tokens used', 
+            images: 'Demo images - no cost'
+          }
         },
         error: error instanceof Error ? error.message : 'Unknown error',
         note: `Gemini API failed, using high-resolution demo images at ${dimensions.width}x${dimensions.height}. Check your GEMINI_API_KEY and ensure you have access to Gemini 2.5 Flash Image Preview.`,
