@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FreeImage Portal
 
-## Getting Started
+AI-Powered Stock Photo Website built with Next.js, TypeScript, and Supabase.
 
-First, run the development server:
+## 🚀 Quick Start
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Set up environment variables:**
+   Copy `.env.example` to `.env.local` and add your credentials:
+   ```bash
+   cp .env.example .env.local
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Configure your `.env.local`:**
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+   NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Set up Supabase database:**
+   - Create a Supabase project
+   - Run the SQL from `supabase-schema.sql` in your Supabase SQL editor
 
-## Learn More
+5. **Start development server:**
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+6. **Visit your site:**
+   Open http://localhost:3000
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🌟 Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **🏠 Homepage** - Hero section with categories and featured images
+- **📁 Categories** - 8 categories (Nature, Business, Technology, etc.)
+- **🔍 Search** - Real-time search with category filtering
+- **🖼️ Image Details** - Individual image pages with download
+- **👨‍💼 Admin Panel** - Complete admin dashboard
+- **🤖 AI Generator** - Create images using Gemini AI
+- **💰 AdSense** - Monetization ready
+- **📱 Responsive** - Mobile-first design
 
-## Deploy on Vercel
+## 🔗 Pages
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Homepage:** `/`
+- **Categories:** `/categories`
+- **Category Page:** `/category/nature` (or any category slug)
+- **Image Detail:** `/image/nature-1` (or any image ID)
+- **Search:** `/search`
+- **Admin Login:** `/admin/login`
+- **Admin Dashboard:** `/admin`
+- **AI Generator:** `/admin/ai-generator`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🗄️ Database Setup
+
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+2. Copy your project URL and anon key
+3. Run the SQL schema from `supabase-schema.sql`
+4. Update your `.env.local` file
+
+## 🤖 AI Integration
+
+The AI generator is configured to use Gemini API. To enable:
+
+1. Get a Gemini API key from [Google AI Studio](https://makersuite.google.com/)
+2. Add it to your `.env.local`:
+   ```env
+   NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
+   ```
+
+**Note:** Gemini API is primarily for text. For actual image generation, you might want to integrate:
+- DALL-E API
+- Stable Diffusion API
+- Midjourney API
+- Replicate API
+
+## 💡 Development
+
+- Built with Next.js 14.2.5 and TypeScript
+- Styled with Tailwind CSS
+- Database with Supabase
+- Authentication with Supabase Auth
+
+## 🚀 Deployment
+
+Ready to deploy to:
+- Vercel (recommended)
+- Netlify
+- AWS S3 + CloudFront
+
+---
+
+**Your FreeImage Portal is ready to use!** 🎉 

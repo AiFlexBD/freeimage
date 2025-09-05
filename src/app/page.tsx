@@ -1,103 +1,504 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { categories } from '@/data/categories'
+import ImageCard from '@/components/ImageCard'
+import AdSense from '@/components/AdSense'
+import FluentLaneAd from '@/components/FluentLaneAd'
+import { getOptimizedImageUrl } from '@/lib/imageUtils'
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+interface DatabaseImage {
+  id: string
+  title: string
+  description?: string
+  download_url: string
+  thumbnail_url?: string
+  category_id: string
+  downloads: number
+  tags?: string[]
+  created_at: string
 }
+
+interface CategoryWithImage {
+  id: string
+  name: string
+  slug: string
+  description: string
+  imageCount: number
+  featuredImage?: DatabaseImage
+}
+
+export default function HomePage() {
+  const [featuredImages, setFeaturedImages] = useState<DatabaseImage[]>([])
+  const [categoriesWithImages, setCategoriesWithImages] = useState<CategoryWithImage[]>([])
+  const [loading, setLoading] = useState(true)
+  const [heroReady, setHeroReady] = useState(false)
+  const [imagesLoaded, setImagesLoaded] = useState(0)
+  const [error, setError] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // Preload hero images
+  useEffect(() => {
+    if (featuredImages.length > 0) {
+      let loadedCount = 0
+      const totalImages = Math.min(featuredImages.length, 8) // Preload first 8 images
+      
+      featuredImages.slice(0, totalImages).forEach((image) => {
+        const img = new Image()
+        img.onload = () => {
+          loadedCount++
+          setImagesLoaded(loadedCount)
+        }
+        img.onerror = () => {
+          loadedCount++
+          setImagesLoaded(loadedCount)
+        }
+        img.src = getOptimizedImageUrl(image.thumbnail_url || image.download_url, 'thumbnail')
+      })
+    }
+  }, [featuredImages])
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch featured images for hero section (limited)
+      const imagesResponse = await fetch('/api/images?limit=12')
+      const imagesData = await imagesResponse.json()
+      
+      // Fetch category statistics efficiently
+      const statsResponse = await fetch('/api/categories/stats')
+      const statsData = await statsResponse.json()
+      
+      // Fetch featured images for categories
+      const featuredResponse = await fetch('/api/categories/featured')
+      const featuredData = await featuredResponse.json()
+      
+      if (imagesData.success && statsData.success && featuredData.success) {
+        // Set featured images for hero
+        setFeaturedImages(imagesData.images || [])
+        
+        // Set hero as ready when we have images
+        if (imagesData.images && imagesData.images.length > 0) {
+          setHeroReady(true)
+        }
+        
+        // Create categories data with accurate counts and featured images
+        const categoriesData = categories.map(category => {
+          const imageCount = statsData.stats[category.id] || 0
+          const featuredImage = featuredData.featured[category.id]
+          
+          return {
+            ...category,
+            imageCount,
+            featuredImage
+          }
+        }).slice(0, 8) // Show only first 8 categories
+        
+        setCategoriesWithImages(categoriesData)
+      } else {
+        setError('Failed to load data')
+        // Still show hero even if no images
+        setHeroReady(true)
+      }
+    } catch (err) {
+      setError('Failed to load data')
+      console.error('Error fetching data:', err)
+      // Still show hero even on error
+      setHeroReady(true)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const query = (e.target as HTMLInputElement).value
+      if (query.trim()) {
+        window.location.href = `/search?q=${encodeURIComponent(query)}`
+      }
+    }
+  }
+
+  const popularSearches = ['nature', 'business', 'technology', 'food', 'abstract', 'people', 'travel', 'lifestyle']
+
+  if (!heroReady) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/30 border-t-white mx-auto mb-6"></div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight">FreeImage</h1>
+          <p className="text-xl text-white/90">Loading amazing AI images...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={fetchData}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Section - Image Search Style */}
+      <section className="relative bg-gradient-to-br from-blue-600 to-purple-600 min-h-[80vh] hero-section">
+        {/* Background Image Mosaic */}
+        {featuredImages.length > 0 && (
+          <div className="absolute inset-0 fade-in">
+            <div className="hero-image-grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+              {Array.from({ length: 40 }, (_, index) => {
+                const image = featuredImages[index % featuredImages.length]
+                return (
+                  <div key={`${image.id}-${index}`} className="relative overflow-hidden bg-gray-300">
+                    <img
+                      src={getOptimizedImageUrl(image.thumbnail_url || image.download_url, 'thumbnail')}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      style={{
+                        filter: 'brightness(0.6) saturate(0.8)',
+                        minHeight: '100px'
+                      }}
+                      loading={index < 8 ? 'eager' : 'lazy'}
+                      onError={(e) => {
+                        // Fallback to a solid color if image fails to load
+                        const target = e.target as HTMLImageElement
+                        target.style.display = 'none'
+                        target.parentElement!.style.backgroundColor = `hsl(${(index * 137.5) % 360}, 50%, 60%)`
+                      }}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50"></div>
+          </div>
+        )}
+        
+        {/* Fallback background if no images */}
+        {featuredImages.length === 0 && (
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700"></div>
+        )}
+        
+        {/* Hero Content Overlay */}
+        <div className="relative z-10 flex items-center justify-center min-h-[80vh] px-4">
+          <div className="text-center text-white max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight drop-shadow-lg">
+              Beautiful AI Images
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-white/95 font-light drop-shadow-md">
+              Discover over {featuredImages.length > 0 ? featuredImages.length * 10 : 120}+ stunning AI-generated images for your projects
+            </p>
+
+            {/* Search Bar - Primary Focus */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search for images... nature, business, abstract"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearch}
+                  className="w-full px-6 py-4 text-lg rounded-full text-gray-900 placeholder-gray-500 bg-white/95 backdrop-blur-sm focus:outline-none focus:ring-4 focus:ring-white/50 shadow-2xl border-0"
+                />
+                <button 
+                  onClick={() => searchQuery.trim() && (window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`)}
+                  className="absolute right-2 top-2 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Popular Searches */}
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              {popularSearches.map((term) => (
+                <button
+                  key={term}
+                  onClick={() => window.location.href = `/search?q=${encodeURIComponent(term)}`}
+                  className="bg-white/20 hover:bg-white/30 text-white px-5 py-2 rounded-full text-sm backdrop-blur-sm transition-all duration-200 border border-white/20 hover:border-white/40"
+                >
+                  {term}
+                </button>
+              ))}
+            </div>
+
+            {/* Quick Stats */}
+            <div className="flex justify-center space-x-8 text-white/95">
+              <div className="text-center">
+                <div className="text-3xl font-bold drop-shadow-md">{featuredImages.length > 0 ? featuredImages.length * 10 : 120}+</div>
+                <div className="text-sm font-medium">Free Images</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold drop-shadow-md">100%</div>
+                <div className="text-sm font-medium">Free to Use</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold drop-shadow-md">AI</div>
+                <div className="text-sm font-medium">Generated</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Google AdSense - Top Banner */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-center">
+          <AdSense 
+            slot="1234567890" 
+            style={{ width: '728px', height: '90px' }} 
+          />
+        </div>
+      </div>
+
+      {/* Categories Section - Visual Grid */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Browse by Category
+            </h2>
+            <p className="text-lg text-gray-600">
+              Find the perfect image for your project
+            </p>
+          </div>
+
+          {categoriesWithImages.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-8">
+              {categoriesWithImages.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/category/${category.slug}`}
+                  className="group relative overflow-hidden rounded-lg aspect-square hover:shadow-xl transition-all duration-300"
+                >
+                  {category.featuredImage ? (
+                    <img
+                      src={category.featuredImage.thumbnail_url || category.featuredImage.download_url}
+                      alt={category.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300"></div>
+                  )}
+                  
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300"></div>
+                  
+                  {/* Category Info */}
+                  <div className="absolute inset-0 flex flex-col justify-end p-4">
+                    <h3 className="text-white font-bold text-lg mb-1 group-hover:text-yellow-300 transition-colors">
+                      {category.name}
+                    </h3>
+                    <p className="text-white/80 text-sm">
+                      {category.imageCount} images
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Loading categories...</p>
+            </div>
+          )}
+
+          <div className="text-center">
+            <Link
+              href="/categories"
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View All Categories
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Google AdSense - Mid Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-center">
+          <AdSense 
+            slot="2345678901" 
+            style={{ width: '300px', height: '250px' }} 
+          />
+        </div>
+      </div>
+
+      {/* Featured Images - Masonry Style */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Free Stock Images
+              </h2>
+              <p className="text-lg text-gray-600">
+                High-quality images you can use anywhere
+              </p>
+            </div>
+            <Link
+              href="/categories"
+              className="hidden md:flex items-center text-blue-600 hover:text-blue-800 font-medium"
+            >
+              See all images
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+
+          {featuredImages.length > 0 ? (
+            <>
+              {/* Masonry Grid */}
+              <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+                {featuredImages.slice(0, 12).map((image, index) => (
+                  <div key={image.id} className="break-inside-avoid">
+                    <div className="group relative overflow-hidden rounded-lg bg-gray-100 hover:shadow-xl transition-all duration-300">
+                      <img
+                        src={getOptimizedImageUrl(image.thumbnail_url || image.download_url, 'thumbnail')}
+                        alt={image.title}
+                        className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+                        style={{ 
+                          aspectRatio: index % 3 === 0 ? '4/5' : index % 3 === 1 ? '3/4' : '1/1' 
+                        }}
+                      />
+                      
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300"></div>
+                      
+                      {/* Image Actions */}
+                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <Link
+                          href={`/image/${categories.find(c => c.id === image.category_id)?.slug}/${image.title.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()}`}
+                          className="bg-white/90 hover:bg-white text-gray-900 p-2 rounded-full shadow-lg backdrop-blur-sm transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </Link>
+                      </div>
+
+                      {/* Image Info */}
+                      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p className="text-white font-medium text-sm truncate">{image.title}</p>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-white/80 text-xs">Free to use</span>
+                          <div className="flex items-center text-white/80 text-xs">
+                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {image.downloads}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Load More */}
+              <div className="text-center mt-12">
+                <Link
+                  href="/categories"
+                  className="inline-flex items-center bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Explore All Images
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Loading images...</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* FluentLane Ad - Single Strategic Placement */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FluentLaneAd variant="inline" />
+        </div>
+      </section>
+
+      {/* Features Section - Simplified */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Why Choose Our Images?
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">100% Free</h3>
+              <p className="text-gray-600">No attribution required. Use for personal and commercial projects.</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">AI-Generated</h3>
+              <p className="text-gray-600">Unique images created with cutting-edge AI technology.</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">High Quality</h3>
+              <p className="text-gray-600">Professional-grade images perfect for any project.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Google AdSense - Bottom */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-center">
+          <AdSense 
+            slot="4567890123" 
+            style={{ width: '728px', height: '90px' }} 
+          />
+        </div>
+      </div>
+    </div>
+  )
+} 
