@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function AdminLayout({
@@ -12,68 +12,89 @@ export default function AdminLayout({
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [userEmail, setUserEmail] = useState('')
+  const [error, setError] = useState('')
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
-    checkAuthStatus()
-    
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        setIsAuthenticated(false)
-        router.push('/admin/login')
-      } else if (event === 'SIGNED_IN' && session) {
-        checkUserRole(session.user.id, session.user.email || '')
-      }
-    })
+    // Skip auth check for login page
+    if (pathname === '/admin/login') {
+      setIsLoading(false)
+      return
+    }
 
-    return () => subscription.unsubscribe()
-  }, [router])
+    // Add a small delay to prevent hydration issues
+    const timer = setTimeout(() => {
+      checkAuthStatus()
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [pathname])
 
   const checkAuthStatus = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError)
+        setError('Authentication error')
+        redirectToLogin()
+        return
+      }
       
       if (session) {
         await checkUserRole(session.user.id, session.user.email || '')
       } else {
         // No session, redirect to login
-        router.push('/admin/login')
-        setIsLoading(false)
+        redirectToLogin()
       }
     } catch (err) {
       console.error('Auth check error:', err)
-      router.push('/admin/login')
-      setIsLoading(false)
+      setError('Failed to verify authentication')
+      redirectToLogin()
     }
   }
 
   const checkUserRole = async (userId: string, email: string) => {
     try {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', userId)
-        .single()
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        setError('No active session')
+        redirectToLogin()
+        return
+      }
 
-      if (error || userData?.role !== 'admin') {
-        // Not an admin, sign out and redirect
+      // Check role from JWT token's user_metadata instead of database
+      const userRole = session.user.user_metadata?.role
+      
+      if (userRole !== 'admin') {
+        setError('Access denied. Admin privileges required.')
         await supabase.auth.signOut()
-        router.push('/admin/login')
-        setIsLoading(false)
+        redirectToLogin()
         return
       }
 
       // User is admin
       setIsAuthenticated(true)
       setUserEmail(email)
-      setIsLoading(false)
+      setError('')
     } catch (err) {
       console.error('Role check error:', err)
+      setError('Failed to verify admin role')
       await supabase.auth.signOut()
-      router.push('/admin/login')
+      redirectToLogin()
+    } finally {
       setIsLoading(false)
     }
+  }
+
+  const redirectToLogin = () => {
+    setIsLoading(false)
+    // Use setTimeout to prevent immediate redirect issues
+    setTimeout(() => {
+      router.push('/admin/login')
+    }, 100)
   }
 
   const handleLogout = async () => {
@@ -83,6 +104,11 @@ export default function AdminLayout({
     } catch (err) {
       console.error('Logout error:', err)
     }
+  }
+
+  // Don't apply admin layout to login page
+  if (pathname === '/admin/login') {
+    return <>{children}</>
   }
 
   if (isLoading) {
@@ -96,12 +122,31 @@ export default function AdminLayout({
     )
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <strong>Access Error</strong>
+            <p className="mt-2">{error}</p>
+          </div>
+          <button
+            onClick={() => router.push('/admin/login')}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <strong>Access Denied</strong>
+          <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+            <strong>Authentication Required</strong>
             <p>Redirecting to login...</p>
           </div>
         </div>

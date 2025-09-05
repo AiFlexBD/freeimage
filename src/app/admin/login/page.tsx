@@ -56,20 +56,10 @@ export default function AdminLogin() {
       }
 
       if (data.user) {
-        // Check if user has admin role
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', data.user.id)
-          .single()
+        // Check if user has admin role from JWT token's user_metadata
+        const userRole = data.user.user_metadata?.role
 
-        if (userError) {
-          setError('Failed to verify admin access')
-          await supabase.auth.signOut()
-          return
-        }
-
-        if (userData?.role !== 'admin') {
+        if (userRole !== 'admin') {
           setError('Access denied. Admin privileges required.')
           await supabase.auth.signOut()
           return
