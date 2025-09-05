@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const categoryId = searchParams.get('category')
     const limit = parseInt(searchParams.get('limit') || '20')
+    const offset = parseInt(searchParams.get('offset') || '0')
     const featured = searchParams.get('featured') === 'true'
 
     let query = supabase
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
         )
       `)
       .order('created_at', { ascending: false })
-      .limit(limit)
+      .range(offset, offset + limit - 1)
 
     if (categoryId) {
       query = query.eq('category_id', categoryId)
