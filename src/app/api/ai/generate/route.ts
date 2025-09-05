@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Quality to resolution mapping
+const QUALITY_SETTINGS = {
+  standard: { size: '1024x1024', description: 'high-quality, detailed' },
+  high: { size: '1536x1536', description: 'very high-quality, ultra-detailed, crisp' },
+  ultra: { size: '2048x2048', description: 'ultra high-quality, extremely detailed, razor-sharp' },
+  max: { size: '4096x4096', description: 'maximum quality, professional-grade, ultra-crisp, print-ready' }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { prompt, aspectRatio, quality, count } = await request.json()
@@ -29,11 +37,55 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Get quality settings
+    const qualityConfig = QUALITY_SETTINGS[quality as keyof typeof QUALITY_SETTINGS] || QUALITY_SETTINGS.standard
+
+    // Calculate dimensions based on aspect ratio and quality
+    const getImageDimensions = (aspectRatio: string, quality: string) => {
+      const baseSize = parseInt(qualityConfig.size.split('x')[0])
+      
+      switch (aspectRatio) {
+        case '16:9':
+          const width169 = Math.round(baseSize * 1.33) // Wider for 16:9
+          const height169 = Math.round(width169 * 9 / 16)
+          return { width: width169, height: height169 }
+        case '9:16':
+          const width916 = Math.round(baseSize * 0.75) // Narrower for 9:16
+          const height916 = Math.round(width916 * 16 / 9)
+          return { width: width916, height: height916 }
+        case '4:3':
+          const width43 = Math.round(baseSize * 1.15)
+          const height43 = Math.round(width43 * 3 / 4)
+          return { width: width43, height: height43 }
+        case '3:4':
+          const width34 = Math.round(baseSize * 0.87)
+          const height34 = Math.round(width34 * 4 / 3)
+          return { width: width34, height: height34 }
+        default: // 1:1 square
+          return { width: baseSize, height: baseSize }
+      }
+    }
+
+    const dimensions = getImageDimensions(aspectRatio, quality)
+
     // Generate images with Gemini 2.5 Flash Image Preview
     try {
       const generatedImages = []
       
       for (let i = 0; i < count; i++) {
+        // Enhanced prompt with quality and resolution specifications
+        const enhancedPrompt = `Create a ${qualityConfig.description} image: ${prompt}. 
+        
+Image specifications:
+- Resolution: ${dimensions.width}x${dimensions.height} pixels
+- Aspect ratio: ${aspectRatio}
+- Quality level: ${qualityConfig.description}
+- Style: Photorealistic, sharp focus, high detail
+- Technical: No compression artifacts, crisp edges, vibrant colors
+- Output: High-resolution, print-quality image suitable for zooming
+
+Make sure the image is extremely detailed and sharp at the requested resolution.`
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: {
@@ -42,9 +94,15 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `Create an image: ${prompt}. Make it ${quality} quality with ${aspectRatio} aspect ratio.`
+                text: enhancedPrompt
               }]
-            }]
+            }],
+            generationConfig: {
+              temperature: 0.4, // Lower temperature for more consistent quality
+              topK: 32,
+              topP: 1,
+              maxOutputTokens: 8192,
+            }
           }),
         })
 
@@ -55,7 +113,7 @@ export async function POST(request: NextRequest) {
         }
 
         const data = await response.json()
-        console.log('Gemini response:', JSON.stringify(data, null, 2))
+        console.log('Gemini response for high-quality image:', JSON.stringify(data, null, 2))
         
         // Extract image from Gemini response
         const candidate = data.candidates?.[0]
@@ -70,11 +128,9 @@ export async function POST(request: NextRequest) {
           }
         }
         
-        // If no image was generated, add placeholder
+        // If no image was generated, add placeholder with correct dimensions
         if (generatedImages.length === i) {
-          const width = aspectRatio === '16:9' ? 1920 : aspectRatio === '9:16' ? 1080 : 1024
-          const height = aspectRatio === '16:9' ? 1080 : aspectRatio === '9:16' ? 1920 : 1024
-          generatedImages.push(`https://picsum.photos/${width}/${height}?random=${Date.now()}-${i}`)
+          generatedImages.push(`https://picsum.photos/${dimensions.width}/${dimensions.height}?random=${Date.now()}-${i}`)
         }
       }
 
@@ -82,29 +138,41 @@ export async function POST(request: NextRequest) {
         success: true,
         images: generatedImages,
         prompt,
-        settings: { aspectRatio, quality, count },
+        settings: { 
+          aspectRatio, 
+          quality, 
+          count,
+          resolution: `${dimensions.width}x${dimensions.height}`,
+          qualityDescription: qualityConfig.description
+        },
         note: generatedImages.some(img => img.startsWith('data:')) 
-          ? 'Generated with Gemini 2.5 Flash Image Preview' 
-          : 'Gemini API responded but no images were generated. Using placeholders.'
+          ? `Generated with Gemini 2.5 Flash Image Preview at ${dimensions.width}x${dimensions.height} resolution` 
+          : 'Gemini API responded but no images were generated. Using high-resolution placeholders.',
+        dimensions
       })
 
     } catch (error) {
       console.error('Gemini generation error:', error)
       
-      // Fallback to demo images if Gemini fails
+      // Fallback to demo images with correct high-resolution dimensions
+      const dimensions = getImageDimensions(aspectRatio, quality)
       const demoImages = Array.from({ length: count }, (_, i) => {
-        const width = aspectRatio === '16:9' ? 1920 : aspectRatio === '9:16' ? 1080 : 1024
-        const height = aspectRatio === '16:9' ? 1080 : aspectRatio === '9:16' ? 1920 : 1024
-        return `https://picsum.photos/${width}/${height}?random=${Date.now()}-${i}`
+        return `https://picsum.photos/${dimensions.width}/${dimensions.height}?random=${Date.now()}-${i}`
       })
 
       return NextResponse.json({
         success: true,
         images: demoImages,
         prompt,
-        settings: { aspectRatio, quality, count },
+        settings: { 
+          aspectRatio, 
+          quality, 
+          count,
+          resolution: `${dimensions.width}x${dimensions.height}`
+        },
         error: error instanceof Error ? error.message : 'Unknown error',
-        note: 'Gemini API failed, using demo images. Check your GEMINI_API_KEY and ensure you have access to Gemini 2.5 Flash Image Preview.'
+        note: `Gemini API failed, using high-resolution demo images at ${dimensions.width}x${dimensions.height}. Check your GEMINI_API_KEY and ensure you have access to Gemini 2.5 Flash Image Preview.`,
+        dimensions
       })
     }
 

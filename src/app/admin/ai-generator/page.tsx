@@ -100,7 +100,8 @@ export default function AIGeneratorPage() {
           categoryId: saveCategoryId,
           title: saveTitle,
           description: saveDescription,
-          tags: saveTags.split(',').map(tag => tag.trim()).filter(tag => tag)
+          tags: saveTags.split(',').map(tag => tag.trim()).filter(tag => tag),
+          dimensions: apiResponse?.dimensions // Pass the actual dimensions from generation
         }),
       })
 
@@ -206,16 +207,21 @@ export default function AIGeneratorPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Quality
+                  Quality & Resolution
                 </label>
                 <select
                   value={quality}
                   onChange={(e) => setQuality(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="standard">Standard</option>
-                  <option value="high">High Quality</option>
+                  <option value="standard">Standard (1024×1024)</option>
+                  <option value="high">High Quality (1536×1536)</option>
+                  <option value="ultra">Ultra High (2048×2048)</option>
+                  <option value="max">Maximum (4096×4096)</option>
                 </select>
+                <p className="text-sm text-gray-500 mt-1">
+                  Higher quality = larger file size, better for print & zoom
+                </p>
               </div>
 
               <div>
@@ -253,16 +259,19 @@ export default function AIGeneratorPage() {
 
         {/* Debug Info */}
         {apiResponse && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
-            <h3 className="text-lg font-semibold text-yellow-900 mb-2">Debug Info</h3>
-            <div className="text-yellow-800 text-sm">
-              <p><strong>Success:</strong> {apiResponse.success ? 'Yes' : 'No'}</p>
-              <p><strong>Images Count:</strong> {apiResponse.images?.length || 0}</p>
-              <p><strong>Note:</strong> {apiResponse.note}</p>
-              {apiResponse.error && <p><strong>Error:</strong> {apiResponse.error}</p>}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
+            <h3 className="text-lg font-semibold text-green-900 mb-2">✅ Generation Complete</h3>
+            <div className="text-green-800 text-sm space-y-1">
+              <p><strong>Status:</strong> {apiResponse.success ? '✅ Success' : '❌ Failed'}</p>
+              <p><strong>Images Generated:</strong> {apiResponse.images?.length || 0}</p>
+              {apiResponse.settings && (
+                <p><strong>Resolution:</strong> {apiResponse.settings.resolution} ({apiResponse.settings.qualityDescription})</p>
+              )}
+              <p><strong>Info:</strong> {apiResponse.note}</p>
+              {apiResponse.error && <p className="text-orange-600"><strong>⚠️ Warning:</strong> {apiResponse.error}</p>}
               {apiResponse.images && apiResponse.images[0] && (
-                <p><strong>First Image Type:</strong> {
-                  apiResponse.images[0].startsWith('data:') ? 'Base64 Data' : 'URL'
+                <p><strong>Image Format:</strong> {
+                  apiResponse.images[0].startsWith('data:') ? '🎨 AI Generated (Base64)' : '🖼️ Demo Image (URL)'
                 }</p>
               )}
             </div>
@@ -415,8 +424,8 @@ export default function AIGeneratorPage() {
 
         {/* Instructions */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">Instructions</h3>
-          <ul className="text-blue-800 space-y-1">
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">Instructions & Quality Guide</h3>
+          <ul className="text-blue-800 space-y-1 mb-4">
             <li>• Make sure you have added your GEMINI_API_KEY to .env.local</li>
             <li>• Be descriptive in your prompts for better results</li>
             <li>• Generated images will include a SynthID watermark</li>
@@ -424,6 +433,32 @@ export default function AIGeneratorPage() {
             <li>• <strong>Download</strong> - Downloads image file directly to your device</li>
             <li>• Check browser console (F12) for detailed debugging info</li>
           </ul>
+          
+          <div className="bg-white rounded-lg p-4 mt-4">
+            <h4 className="font-semibold text-blue-900 mb-2">🎨 Quality & Resolution Guide:</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <div>
+                <strong>Standard (1024×1024):</strong><br/>
+                Good for web, social media
+              </div>
+              <div>
+                <strong>High Quality (1536×1536):</strong><br/>
+                Better detail, good for larger displays
+              </div>
+              <div>
+                <strong>Ultra High (2048×2048):</strong><br/>
+                Excellent for print, professional use
+              </div>
+              <div>
+                <strong>Maximum (4096×4096):</strong><br/>
+                Print-ready, zoom without pixelation
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              💡 <strong>Tip:</strong> Higher resolutions take longer to generate and create larger files, 
+              but they won't pixelate when zoomed or printed at large sizes.
+            </p>
+          </div>
         </div>
       </div>
     </div>

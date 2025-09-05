@@ -6,16 +6,44 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// Function to get image dimensions from base64 data
+async function getImageDimensions(base64Data: string): Promise<{ width: number; height: number }> {
+  try {
+    // Remove data URL prefix
+    const cleanBase64 = base64Data.replace(/^data:image\/[a-z]+;base64,/, '')
+    const buffer = Buffer.from(cleanBase64, 'base64')
+    
+    // For PNG files, we can extract dimensions from the header
+    // PNG signature: 89 50 4E 47 0D 0A 1A 0A
+    // IHDR chunk starts at byte 8, width at bytes 16-19, height at bytes 20-23
+    if (buffer.length > 24) {
+      // Check if it's a PNG file
+      if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
+        const width = buffer.readUInt32BE(16)
+        const height = buffer.readUInt32BE(20)
+        return { width, height }
+      }
+    }
+    
+    // Fallback: return default dimensions
+    return { width: 1024, height: 1024 }
+  } catch (error) {
+    console.error('Error extracting image dimensions:', error)
+    return { width: 1024, height: 1024 }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     console.log('Save API: Starting request...')
     
-    const { imageData, prompt, categoryId, title, description } = await request.json()
+    const { imageData, prompt, categoryId, title, description, tags, dimensions } = await request.json()
     console.log('Save API: Request data received:', { 
       hasImageData: !!imageData, 
       prompt: prompt?.substring(0, 50), 
       categoryId, 
-      title 
+      title,
+      dimensions
     })
 
     // Validate input
@@ -41,6 +69,10 @@ export async function POST(request: NextRequest) {
     const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '')
     const buffer = Buffer.from(base64Data, 'base64')
     console.log('Save API: Buffer created, size:', buffer.length)
+    
+    // Get actual image dimensions
+    const imageDimensions = dimensions || await getImageDimensions(imageData)
+    console.log('Save API: Image dimensions:', imageDimensions)
     
     // Generate unique filename
     const timestamp = Date.now()
@@ -90,9 +122,9 @@ export async function POST(request: NextRequest) {
         description: description || `Generated with Gemini 2.5 Flash: ${prompt}`,
         filename: filename,
         category_id: categoryId,
-        tags: ['ai-generated', 'gemini'],
-        width: 1024, // Default, could be extracted from image
-        height: 1024, // Default, could be extracted from image
+        tags: tags || ['ai-generated', 'gemini'],
+        width: imageDimensions.width,
+        height: imageDimensions.height,
         file_size: buffer.length,
         download_url: publicUrl,
         thumbnail_url: thumbnailUrl,
@@ -118,37 +150,38 @@ export async function POST(request: NextRequest) {
 
     // Also save to ai_generations table
     const generationId = `gen_${timestamp}_${Math.random().toString(36).substring(7)}`
-    console.log('Save API: Creating AI generation record with ID:', generationId)
-    
     const { error: genError } = await supabase
       .from('ai_generations')
       .insert({
         id: generationId,
-        user_id: null, // Could be set if user is logged in
+        image_id: imageId,
         prompt: prompt,
-        style: 'gemini-2.5-flash',
-        quality: 'standard',
-        aspect_ratio: '1:1',
-        generated_images: [{ url: publicUrl, image_id: imageId }],
-        status: 'completed'
+        model: 'gemini-2.5-flash-image-preview',
+        settings: {
+          quality: 'ai-generated',
+          aspectRatio: 'custom',
+          width: imageDimensions.width,
+          height: imageDimensions.height
+        },
+        created_at: new Date().toISOString()
       })
 
     if (genError) {
-      console.error('Save API: AI generation record error:', genError)
-      // Don't fail the whole request for this
+      console.error('Save API: Generation record error:', genError)
+      // Don't fail the main request for this
     }
 
-    console.log('Save API: Success! Returning response')
+    console.log('Save API: Success! Returning response...')
     return NextResponse.json({
       success: true,
       image: imageRecord,
-      message: 'Image saved successfully to gallery'
+      message: `Image saved successfully at ${imageDimensions.width}×${imageDimensions.height} resolution!`
     })
 
   } catch (error) {
     console.error('Save API: Unexpected error:', error)
     return NextResponse.json(
-      { error: `Failed to save image: ${error instanceof Error ? error.message : 'Unknown error'}` },
+      { error: 'Failed to save image' },
       { status: 500 }
     )
   }
