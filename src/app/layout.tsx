@@ -11,10 +11,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://imagegenfree.com'),
   title: {
-    default: 'ImageGenFree - Free AI Generated Images for Commercial Use',
-    template: '%s | ImageGenFree'
+    default: 'Free AI Generated Images - Download Royalty-Free Stock Photos | ImageGenFree',
+    template: '%s | ImageGenFree - Free AI Images'
   },
-  description: 'Download thousands of stunning AI-generated images for free. Perfect for websites, marketing, social media, and commercial projects. No attribution required.',
+  description: 'Download thousands of high-quality AI generated images for free. Perfect for websites, marketing, social media, and commercial projects. No attribution required, royalty-free stock photos.',
   keywords: [
     'free AI images',
     'AI generated images',
@@ -25,7 +25,23 @@ export const metadata: Metadata = {
     'artificial intelligence images',
     'free download images',
     'ImageGenFree',
-    'no attribution required'
+    'no attribution required',
+    'high quality AI images',
+    'AI photography',
+    'machine learning images',
+    'computer generated art',
+    'digital art free',
+    'AI stock photos',
+    'free graphics',
+    'commercial license images',
+    'business images free',
+    'marketing images',
+    'social media images',
+    'website images',
+    'blog images',
+    'presentation images',
+    'design resources',
+    'creative commons alternative'
   ],
   authors: [{ name: 'ImageGenFree' }],
   creator: 'ImageGenFree',
@@ -40,23 +56,24 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://imagegenfree.com',
     siteName: 'ImageGenFree',
-    title: 'ImageGenFree - Free AI Generated Images for Commercial Use',
-    description: 'Download thousands of stunning AI-generated images for free. Perfect for websites, marketing, social media, and commercial projects.',
+    title: 'Free AI Generated Images - Download Royalty-Free Stock Photos',
+    description: 'Download thousands of high-quality AI generated images for free. Perfect for websites, marketing, social media, and commercial projects. No attribution required.',
     images: [
       {
         url: 'https://imagegenfree.com/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'ImageGenFree - Free AI Generated Images',
+        alt: 'ImageGenFree - Free AI Generated Images for Commercial Use',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ImageGenFree - Free AI Generated Images for Commercial Use',
-    description: 'Download thousands of stunning AI-generated images for free. Perfect for websites, marketing, social media, and commercial projects.',
+    title: 'Free AI Generated Images - Download Royalty-Free Stock Photos',
+    description: 'Download thousands of high-quality AI generated images for free. Perfect for websites, marketing, social media, and commercial projects.',
     images: ['https://imagegenfree.com/og-image.jpg'],
     creator: '@imagegenfree',
+    site: '@imagegenfree',
   },
   robots: {
     index: true,

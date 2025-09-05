@@ -201,10 +201,10 @@ export default function HomePage() {
         <div className="relative z-10 flex items-center justify-center min-h-[80vh] px-4">
           <div className="text-center text-white max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight drop-shadow-lg">
-              Beautiful AI Images
+              Free AI Generated Images
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-white/95 font-light drop-shadow-md">
-              Discover over {featuredImages.length > 0 ? featuredImages.length * 10 : 120}+ stunning AI-generated images for your projects
+              Download over {featuredImages.length > 0 ? featuredImages.length * 10 : 120}+ high-quality AI images for commercial use. No attribution required, royalty-free stock photos for websites, marketing, and social media.
             </p>
 
             {/* Search Bar - Primary Focus */}
@@ -212,15 +212,16 @@ export default function HomePage() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search for images... nature, business, abstract"
+                  placeholder="Search free AI images: nature, business, abstract, technology..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearch}
                   className="w-full px-6 py-4 text-lg rounded-full text-gray-900 placeholder-gray-500 bg-white/95 backdrop-blur-sm focus:outline-none focus:ring-4 focus:ring-white/50 shadow-2xl border-0"
                 />
-                <button 
+                <button
                   onClick={() => searchQuery.trim() && (window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`)}
                   className="absolute right-2 top-2 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+                  aria-label="Search AI images"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -229,7 +230,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Popular Searches */}
+            {/* Popular Searches - SEO Keywords */}
             <div className="flex flex-wrap justify-center gap-3 mb-8">
               {popularSearches.map((term) => (
                 <button
@@ -242,19 +243,23 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* Quick Stats */}
-            <div className="flex justify-center space-x-8 text-white/95">
+            {/* Value Propositions - SEO Keywords */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-white/95 mb-8">
               <div className="text-center">
-                <div className="text-3xl font-bold drop-shadow-md">{featuredImages.length > 0 ? featuredImages.length * 10 : 120}+</div>
-                <div className="text-sm font-medium">Free Images</div>
+                <div className="text-2xl md:text-3xl font-bold drop-shadow-md">{featuredImages.length > 0 ? featuredImages.length * 10 : 120}+</div>
+                <div className="text-sm font-medium">Free AI Images</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold drop-shadow-md">100%</div>
-                <div className="text-sm font-medium">Free to Use</div>
+                <div className="text-2xl md:text-3xl font-bold drop-shadow-md">100%</div>
+                <div className="text-sm font-medium">Commercial Use</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold drop-shadow-md">AI</div>
-                <div className="text-sm font-medium">Generated</div>
+                <div className="text-2xl md:text-3xl font-bold drop-shadow-md">No</div>
+                <div className="text-sm font-medium">Attribution</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl md:text-3xl font-bold drop-shadow-md">HD</div>
+                <div className="text-sm font-medium">Quality</div>
               </div>
             </div>
           </div>
@@ -499,6 +504,92 @@ export default function HomePage() {
           />
         </div>
       </div>
+
+      {/* FluentLane Ad */}
+      <div className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FluentLaneAd variant="banner" />
+        </div>
+      </div>
+
+      {/* SEO Content Section */}
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Why Choose ImageGenFree for AI Generated Images?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              The ultimate destination for high-quality, royalty-free AI images. Perfect for businesses, marketers, designers, and content creators.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">100% Free Forever</h3>
+              <p className="text-gray-600">
+                Download unlimited AI generated images without any cost. No hidden fees, no subscriptions, no watermarks. Completely free for personal and commercial use.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Commercial License</h3>
+              <p className="text-gray-600">
+                Use our AI images for websites, marketing campaigns, social media posts, print materials, and any commercial project. No attribution required.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-lg">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">High-Quality AI Art</h3>
+              <p className="text-gray-600">
+                Every image is generated using advanced AI technology, ensuring crisp, detailed, and professional-quality results for your creative projects.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-8 shadow-lg">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              Popular AI Image Categories
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+              {[
+                'Nature Photography', 'Business Images', 'Technology Graphics', 'Food Photography',
+                'Abstract Art', 'People & Portraits', 'Travel Destinations', 'Lifestyle Photos'
+              ].map((category, index) => (
+                <div key={index} className="text-center p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors">
+                  <div className="text-sm font-medium text-gray-800">{category}</div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-8 text-center">
+              <p className="text-gray-600 mb-4">
+                <strong>Perfect for:</strong> Web designers, marketers, bloggers, social media managers, small businesses, 
+                content creators, students, and anyone needing high-quality stock photos without the cost.
+              </p>
+              <p className="text-sm text-gray-500">
+                All images are AI-generated and royalty-free. Use them in websites, presentations, marketing materials, 
+                social media posts, print designs, and commercial projects without worrying about licensing fees or copyright issues.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 } 
