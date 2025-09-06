@@ -155,11 +155,11 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
     }
 
     return (
-      <div className="flex justify-center items-center mt-12 mb-8">
-        <div className="flex items-center space-x-1">
+      <div className="flex flex-col sm:flex-row justify-center items-center mt-8 sm:mt-12 mb-6 sm:mb-8 space-y-4 sm:space-y-0">
+        <div className="flex items-center space-x-1 order-2 sm:order-1">
           {pages}
         </div>
-        <div className="ml-6 text-sm text-gray-600">
+        <div className="sm:ml-6 text-xs sm:text-sm text-gray-600 order-1 sm:order-2">
           Showing {((currentPage - 1) * pagination.imagesPerPage) + 1} to{' '}
           {Math.min(currentPage * pagination.imagesPerPage, pagination.totalImages)} of{' '}
           {pagination.totalImages} images
@@ -197,10 +197,10 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
     <div className="min-h-screen bg-gray-50">
       {/* Category Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
           <div className="text-center">
-            <nav className="mb-6">
-              <ol className="flex items-center justify-center space-x-2 text-sm">
+            <nav className="mb-4 sm:mb-6">
+              <ol className="flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
                 <li>
                   <Link href="/" className="text-blue-600 hover:text-blue-800">
                     Home
@@ -213,33 +213,33 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
                   </Link>
                 </li>
                 <li className="text-gray-500">/</li>
-                <li className="text-gray-900 font-medium">{category.name}</li>
+                <li className="text-gray-900 font-medium truncate max-w-[100px] sm:max-w-none">{category.name}</li>
               </ol>
             </nav>
 
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 px-4">
               {category.name} Images
             </h1>
-            <p className="text-xl text-gray-600 mb-6 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-4 sm:mb-6 max-w-2xl mx-auto px-4">
               {category.description}
             </p>
             
             {!loading && (
-              <div className="flex justify-center items-center space-x-6 text-sm text-gray-500">
+              <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4 md:space-x-6 text-xs sm:text-sm text-gray-500 px-4">
                 <span className="flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   {pagination.totalImages} Images
                 </span>
                 <span className="flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                   </svg>
                   100% Free
                 </span>
                 <span className="flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Commercial Use
@@ -250,25 +250,25 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="grid lg:grid-cols-4 gap-6 sm:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="bg-white rounded-lg shadow-sm overflow-hidden animate-pulse">
                     <div className="aspect-square bg-gray-200"></div>
-                    <div className="p-4">
-                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    <div className="p-3 sm:p-4">
+                      <div className="h-3 sm:h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-2 sm:h-3 bg-gray-200 rounded w-2/3"></div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : categoryImages.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {categoryImages.map((image) => (
                     <ImageCard key={image.id} image={image} />
                   ))}
@@ -278,25 +278,25 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
                 {renderPagination()}
               </>
             ) : (
-              <div className="text-center py-16">
-                <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center py-12 sm:py-16 px-4">
+                <svg className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No images found</h3>
-                <p className="text-gray-600 mb-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">No images found</h3>
+                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
                   We haven't added any {category.name.toLowerCase()} images yet, but we're working on it!
                 </p>
                 <div className="space-y-3">
                   <Link
                     href="/categories"
-                    className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="inline-block bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
                   >
                     Browse Other Categories
                   </Link>
                   <div>
                     <Link
                       href="/search"
-                      className="text-blue-600 hover:text-blue-800 text-sm"
+                      className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm"
                     >
                       Or search for specific images →
                     </Link>

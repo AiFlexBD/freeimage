@@ -159,15 +159,20 @@ export default function AdminLayout({
       {/* Admin Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">ImageGenFree Admin</h1>
+              <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
+                <span className="hidden sm:inline">ImageGenFree Admin</span>
+                <span className="sm:hidden">Admin</span>
+              </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">Welcome, {userEmail}</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <span className="text-xs sm:text-sm text-gray-500 hidden sm:inline">
+                Welcome, {userEmail}
+              </span>
               <button
                 onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+                className="bg-red-600 text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-md hover:bg-red-700 transition-colors text-xs sm:text-sm"
               >
                 Logout
               </button>
@@ -177,24 +182,24 @@ export default function AdminLayout({
       </header>
 
       {/* Admin Navigation */}
-      <nav className="bg-gray-50 border-b">
+      <nav className="bg-gray-50 border-b overflow-x-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
+          <div className="flex space-x-4 sm:space-x-8 min-w-max">
             <a
               href="/admin"
-              className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+              className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm"
             >
               Dashboard
             </a>
             <a
               href="/admin/ai-generator"
-              className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+              className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm"
             >
               AI Generator
             </a>
             <a
               href="/admin/images"
-              className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+              className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm"
             >
               Images
             </a>
@@ -203,7 +208,7 @@ export default function AdminLayout({
       </nav>
 
       {/* Admin Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
         {children}
       </main>
     </div>

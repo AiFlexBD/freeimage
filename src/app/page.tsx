@@ -198,32 +198,32 @@ export default function HomePage() {
         )}
         
         {/* Hero Content Overlay */}
-        <div className="relative z-10 flex items-center justify-center min-h-[80vh] px-4">
-          <div className="text-center text-white max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight drop-shadow-lg">
+        <div className="relative z-10 flex items-center justify-center min-h-[80vh] px-4 sm:px-6">
+          <div className="text-center text-white max-w-5xl mx-auto">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 tracking-tight drop-shadow-lg leading-tight">
               Free AI Generated Images
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-white/95 font-light drop-shadow-md">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 text-white/95 font-light drop-shadow-md px-2 leading-relaxed">
               Download over {featuredImages.length > 0 ? featuredImages.length * 10 : 120}+ high-quality AI images for commercial use. No attribution required, royalty-free stock photos for websites, marketing, and social media.
             </p>
 
             {/* Search Bar - Primary Focus */}
-            <div className="max-w-2xl mx-auto mb-8">
+            <div className="max-w-2xl mx-auto mb-6 sm:mb-8 px-2">
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search free AI images: nature, business, abstract, technology..."
+                  placeholder="Search free AI images..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleSearch}
-                  className="w-full px-6 py-4 text-lg rounded-full text-gray-900 placeholder-gray-500 bg-white/95 backdrop-blur-sm focus:outline-none focus:ring-4 focus:ring-white/50 shadow-2xl border-0"
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg rounded-full text-gray-900 placeholder-gray-500 bg-white/95 backdrop-blur-sm focus:outline-none focus:ring-4 focus:ring-white/50 shadow-2xl border-0"
                 />
                 <button
                   onClick={() => searchQuery.trim() && (window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`)}
-                  className="absolute right-2 top-2 bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+                  className="absolute right-2 top-2 sm:top-2 bg-blue-600 text-white p-2 sm:p-3 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
                   aria-label="Search AI images"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
@@ -231,12 +231,12 @@ export default function HomePage() {
             </div>
 
             {/* Popular Searches - SEO Keywords */}
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8 px-4">
               {popularSearches.map((term) => (
                 <button
                   key={term}
                   onClick={() => window.location.href = `/search?q=${encodeURIComponent(term)}`}
-                  className="bg-white/20 hover:bg-white/30 text-white px-5 py-2 rounded-full text-sm backdrop-blur-sm transition-all duration-200 border border-white/20 hover:border-white/40"
+                  className="bg-white/20 hover:bg-white/30 text-white px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm backdrop-blur-sm transition-all duration-200 border border-white/20 hover:border-white/40 whitespace-nowrap"
                 >
                   {term}
                 </button>
@@ -244,22 +244,22 @@ export default function HomePage() {
             </div>
 
             {/* Value Propositions - SEO Keywords */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-white/95 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-white/95 mb-6 sm:mb-8 px-2">
               <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold drop-shadow-md">{featuredImages.length > 0 ? featuredImages.length * 10 : 120}+</div>
-                <div className="text-sm font-medium">Free AI Images</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold drop-shadow-md">{featuredImages.length > 0 ? featuredImages.length * 10 : 120}+</div>
+                <div className="text-xs sm:text-sm font-medium mt-1">Free AI Images</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold drop-shadow-md">100%</div>
-                <div className="text-sm font-medium">Commercial Use</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold drop-shadow-md">100%</div>
+                <div className="text-xs sm:text-sm font-medium mt-1">Commercial Use</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold drop-shadow-md">No</div>
-                <div className="text-sm font-medium">Attribution</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold drop-shadow-md">No</div>
+                <div className="text-xs sm:text-sm font-medium mt-1">Attribution</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold drop-shadow-md">HD</div>
-                <div className="text-sm font-medium">Quality</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold drop-shadow-md">HD</div>
+                <div className="text-xs sm:text-sm font-medium mt-1">Quality</div>
               </div>
             </div>
           </div>
@@ -277,19 +277,19 @@ export default function HomePage() {
       </div>
 
       {/* Categories Section - Visual Grid */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-12 sm:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">
               Browse by Category
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-base sm:text-lg text-gray-600">
               Find the perfect image for your project
             </p>
           </div>
 
           {categoriesWithImages.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
               {categoriesWithImages.map((category) => (
                 <Link
                   key={category.id}
@@ -310,11 +310,11 @@ export default function HomePage() {
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300"></div>
                   
                   {/* Category Info */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-4">
-                    <h3 className="text-white font-bold text-lg mb-1 group-hover:text-yellow-300 transition-colors">
+                  <div className="absolute inset-0 flex flex-col justify-end p-2 sm:p-3 md:p-4">
+                    <h3 className="text-white font-bold text-sm sm:text-base md:text-lg mb-0.5 sm:mb-1 group-hover:text-yellow-300 transition-colors">
                       {category.name}
                     </h3>
-                    <p className="text-white/80 text-sm">
+                    <p className="text-white/80 text-xs sm:text-sm">
                       {category.imageCount} images
                     </p>
                   </div>
@@ -322,7 +322,7 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-8 sm:py-12">
               <p className="text-gray-600">Loading categories...</p>
             </div>
           )}
@@ -330,7 +330,7 @@ export default function HomePage() {
           <div className="text-center">
             <Link
               href="/categories"
-              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm sm:text-base"
             >
               View All Categories
               <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,20 +352,20 @@ export default function HomePage() {
       </div>
 
       {/* Featured Images - Masonry Style */}
-      <section className="py-16 bg-white">
+      <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-12">
+            <div className="mb-4 sm:mb-0">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
                 Free Stock Images
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-base sm:text-lg text-gray-600">
                 High-quality images you can use anywhere
               </p>
             </div>
             <Link
               href="/categories"
-              className="hidden md:flex items-center text-blue-600 hover:text-blue-800 font-medium"
+              className="inline-flex sm:hidden md:flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm sm:text-base"
             >
               See all images
               <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -376,8 +376,8 @@ export default function HomePage() {
 
           {featuredImages.length > 0 ? (
             <>
-              {/* Masonry Grid */}
-              <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+              {/* Masonry Grid - Better Mobile Layout */}
+              <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-3 sm:gap-4 space-y-3 sm:space-y-4">
                 {featuredImages.slice(0, 12).map((image, index) => (
                   <div key={image.id} className="break-inside-avoid">
                     <div className="group relative overflow-hidden rounded-lg bg-gray-100 hover:shadow-xl transition-all duration-300">
@@ -394,7 +394,7 @@ export default function HomePage() {
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300"></div>
                       
                       {/* Image Actions */}
-                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute top-2 sm:top-4 right-2 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <Link
                           href={`/image/${categories.find(c => c.id === image.category_id)?.slug}/${image.title.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()}`}
                           className="bg-white/90 hover:bg-white text-gray-900 p-2 rounded-full shadow-lg backdrop-blur-sm transition-colors"
