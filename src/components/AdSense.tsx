@@ -72,7 +72,8 @@ export function AdSenseInit() {
     const publisherId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID
     const isEnabled = process.env.NEXT_PUBLIC_ADSENSE_ENABLED === 'true'
     
-    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production' && isEnabled && publisherId) {
+    // Load script in both development and production for Google verification
+    if (typeof window !== 'undefined' && isEnabled && publisherId) {
       // Check if script already exists
       const existingScript = document.querySelector(`script[src*="adsbygoogle.js"]`)
       
@@ -83,6 +84,14 @@ export function AdSenseInit() {
         script.crossOrigin = 'anonymous'
         script.onload = () => {
           console.log('AdSense script loaded successfully')
+          // Only push ads in production
+          if (process.env.NODE_ENV === 'production') {
+            try {
+              ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({})
+            } catch (error) {
+              console.error('AdSense initialization error:', error)
+            }
+          }
         }
         script.onerror = () => {
           console.error('Failed to load AdSense script')

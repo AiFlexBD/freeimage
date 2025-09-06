@@ -170,6 +170,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         
+        {/* Google AdSense Script - Always load for verification */}
+        <script 
+          async 
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3416527767689571"
+          crossOrigin="anonymous"
+        />
+        
         <StructuredData />
         <ServiceWorkerRegistration />
       </head>
