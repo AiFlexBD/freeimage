@@ -64,5 +64,85 @@ export const categories: Category[] = [
     description: 'World destinations and travel experiences',
     imageCount: 110,
     featuredImage: '/images/travel/featured.jpg'
+  },
+  {
+    id: 'lifestyle',
+    name: 'Lifestyle',
+    slug: 'lifestyle',
+    description: 'Modern lifestyle, wellness, and daily activities',
+    imageCount: 85,
+    featuredImage: '/images/lifestyle/featured.jpg'
+  },
+  {
+    id: 'animals',
+    name: 'Animals',
+    slug: 'animals',
+    description: 'Wildlife, pets, and animal photography',
+    imageCount: 95,
+    featuredImage: '/images/animals/featured.jpg'
+  },
+  {
+    id: 'sports',
+    name: 'Sports',
+    slug: 'sports',
+    description: 'Athletic activities and sports equipment',
+    imageCount: 75,
+    featuredImage: '/images/sports/featured.jpg'
+  },
+  {
+    id: 'fashion',
+    name: 'Fashion',
+    slug: 'fashion',
+    description: 'Style, clothing, and fashion photography',
+    imageCount: 80,
+    featuredImage: '/images/fashion/featured.jpg'
+  },
+  {
+    id: 'automotive',
+    name: 'Automotive',
+    slug: 'automotive',
+    description: 'Cars, motorcycles, and transportation',
+    imageCount: 65,
+    featuredImage: '/images/automotive/featured.jpg'
+  },
+  {
+    id: 'art',
+    name: 'Art',
+    slug: 'art',
+    description: 'Artistic creations and creative expressions',
+    imageCount: 90,
+    featuredImage: '/images/art/featured.jpg'
+  },
+  {
+    id: 'science',
+    name: 'Science',
+    slug: 'science',
+    description: 'Scientific concepts, laboratories, and research',
+    imageCount: 70,
+    featuredImage: '/images/science/featured.jpg'
+  },
+  {
+    id: 'education',
+    name: 'Education',
+    slug: 'education',
+    description: 'Learning, schools, and educational concepts',
+    imageCount: 60,
+    featuredImage: '/images/education/featured.jpg'
+  },
+  {
+    id: 'healthcare',
+    name: 'Healthcare',
+    slug: 'healthcare',
+    description: 'Medical, wellness, and healthcare imagery',
+    imageCount: 55,
+    featuredImage: '/images/healthcare/featured.jpg'
+  },
+  {
+    id: 'music',
+    name: 'Music',
+    slug: 'music',
+    description: 'Musical instruments, concerts, and audio concepts',
+    imageCount: 65,
+    featuredImage: '/images/music/featured.jpg'
   }
 ]; 
