@@ -66,7 +66,7 @@ AI-Powered Stock Photo Website built with Next.js, TypeScript, and Supabase.
 
 ## 🤖 AI Integration
 
-The AI generator is configured to use Gemini API. To enable:
+The AI generator uses Gemini 2.5 Flash Image Preview for image generation:
 
 1. Get a Gemini API key from [Google AI Studio](https://makersuite.google.com/)
 2. Add it to your `.env.local`:
@@ -74,11 +74,20 @@ The AI generator is configured to use Gemini API. To enable:
    NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
    ```
 
-**Note:** Gemini API is primarily for text. For actual image generation, you might want to integrate:
-- DALL-E API
-- Stable Diffusion API
-- Midjourney API
-- Replicate API
+## 💰 AdSense Integration
+
+Google AdSense is integrated for monetization:
+
+1. **Setup AdSense Account:** Get approved at [Google AdSense](https://www.google.com/adsense/)
+2. **Configure Environment:**
+   ```env
+   NEXT_PUBLIC_ADSENSE_ENABLED=true
+   NEXT_PUBLIC_ADSENSE_PUBLISHER_ID=ca-pub-your-publisher-id
+   ```
+3. **Development Mode:** Shows placeholders with your ad slot info
+4. **Production Mode:** Displays real ads when deployed
+
+**Current Publisher ID:** `ca-pub-3416527767689571` ✅
 
 ## 💡 Development
 
