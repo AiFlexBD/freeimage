@@ -73,7 +73,7 @@ export default function AdminLayout({
         await supabase.auth.signOut()
         redirectToLogin()
         return
-      }
+        }
 
       // User is admin
       setIsAuthenticated(true)
@@ -84,9 +84,9 @@ export default function AdminLayout({
       setError('Failed to verify admin role')
       await supabase.auth.signOut()
       redirectToLogin()
-    } finally {
+      } finally {
       setIsLoading(false)
-    }
+      }
   }
 
   const redirectToLogin = () => {

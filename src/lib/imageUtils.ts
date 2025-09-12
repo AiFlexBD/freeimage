@@ -65,9 +65,9 @@ export function getOptimizedImageUrl(
       url.searchParams.set('quality', quality.toString())
       url.searchParams.set('format', format)
       
-      // Add cache control parameter for Supabase
+      // Add cache control parameter for Supabase (removed daily cache bust for better performance)
       if (cache) {
-        url.searchParams.set('t', Math.floor(Date.now() / (1000 * 60 * 60 * 24)).toString()) // Daily cache bust
+        url.searchParams.set('cache', '1') // Enable Supabase caching
       }
       
       const optimizedUrl = url.toString()
