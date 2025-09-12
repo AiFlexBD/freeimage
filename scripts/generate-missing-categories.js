@@ -8,9 +8,9 @@
 // Use built-in fetch (Node.js 18+)
 const fetch = globalThis.fetch;
 
-// Categories that currently have images (from API response)
+// Categories that currently have images (updated list)
 const categoriesWithImages = [
-  'nature', 'business', 'technology', 'people', 'food', 'abstract', 'travel'
+  'nature', 'business', 'technology', 'people', 'food', 'abstract', 'travel', 'architecture'
 ];
 
 // All defined categories
@@ -122,22 +122,28 @@ const categoryPrompts = {
     "Documentary-style photograph of traditional Japanese temple architecture, captured with Fujifilm GFX 100S, authentic cultural photography, natural lighting, professional composition, travel magazine quality"
   ],
   lifestyle: [
-    "Candid lifestyle photograph of young professional working at trendy coffee shop, shot with Canon 5D Mark IV, natural window lighting, authentic moment, lifestyle magazine photography, genuine human expression, professional depth of field",
-    "Authentic morning wellness routine photograph, yoga practitioner in bright modern apartment, shot with Sony A7 III, natural lighting, lifestyle photography, genuine moment, health magazine quality, ultra-realistic details",
-    "Professional lifestyle photograph of modern Scandinavian living room, natural lighting, cozy atmosphere, interior design magazine quality, shot with Nikon Z7 II, authentic home styling, warm and inviting",
-    "Documentary-style photograph of weekend farmers market scene, authentic local culture, shot with Leica Q2, natural lighting, lifestyle journalism, genuine community interaction, professional street photography"
+    "Wide panoramic lifestyle photograph of young professional working at trendy coffee shop with large windows, shot with Canon 5D Mark IV, natural window lighting, authentic moment, lifestyle magazine photography, horizontal composition, wide-angle view",
+    "Panoramic morning wellness routine photograph, yoga practitioner in bright modern apartment with city skyline view, shot with Sony A7 III, natural lighting, lifestyle photography, wide horizontal format, health magazine quality",
+    "Wide-angle professional lifestyle photograph of modern Scandinavian living room with panoramic windows, natural lighting, cozy atmosphere, interior design magazine quality, shot with Nikon Z7 II, horizontal composition",
+    "Wide documentary-style photograph of weekend farmers market scene, authentic local culture, shot with Leica Q2, natural lighting, lifestyle journalism, panoramic view of market stalls, professional street photography",
+    "Panoramic family dinner gathering photograph, multi-generational family around dining table, shot with Canon EOS R6, warm golden hour lighting, authentic family lifestyle, wide horizontal composition, lifestyle magazine quality",
+    "Wide-angle home office workspace photograph, remote work setup with mountain view window, shot with Sony A7R IV, natural lighting, work-life balance lifestyle, horizontal composition, modern productivity aesthetic"
   ],
   animals: [
     "Wildlife photography masterpiece of African lion in natural habitat, shot with Canon EOS-1D X Mark III, 600mm telephoto lens, golden hour lighting, National Geographic quality, authentic wildlife behavior, professional nature photography",
     "Heartwarming pet portrait of golden retriever in autumn park, shot with Nikon D780, natural lighting, professional pet photography, genuine emotion, shallow depth of field, award-winning animal photography",
     "Stunning wildlife photograph of colorful macaw in Costa Rican rainforest, shot with Sony A9 II, natural habitat, professional nature photography, vibrant natural colors, BBC Planet Earth quality documentation",
-    "Majestic wild horse photography in American Southwest landscape, shot with Canon EOS R6, telephoto lens, natural behavior, professional wildlife photography, dramatic natural lighting, authentic Western scenery"
+    "Majestic wild horse photography in American Southwest landscape, shot with Canon EOS R6, telephoto lens, natural behavior, professional wildlife photography, dramatic natural lighting, authentic Western scenery",
+    "Professional elephant family photography in African savanna, shot with Canon EOS-1D X Mark III, telephoto lens, golden hour lighting, authentic wildlife behavior, National Geographic documentary style",
+    "Adorable cat portrait photography in natural window light, shot with Sony A7 III, shallow depth of field, professional pet photography, genuine feline expression, lifestyle pet photography"
   ],
   sports: [
     "Professional sports photography of basketball player mid-dunk, shot with Nikon D6, fast shutter speed, arena lighting, Sports Illustrated quality, authentic athletic moment, dynamic action, professional sports journalism",
     "Olympic swimming competition photograph, underwater action shot, professional sports photography, captured with specialized underwater housing, authentic competitive moment, crystal clear water, professional timing",
     "Professional tennis tournament photography, player serving at Wimbledon, shot with Canon EOS-1D X Mark III, perfect timing, authentic competitive moment, professional sports journalism, natural grass court",
-    "Marathon runner crossing finish line, emotional victory moment, shot with Sony A9 II, natural lighting, authentic human achievement, professional sports photography, genuine celebration"
+    "Marathon runner crossing finish line, emotional victory moment, shot with Sony A9 II, natural lighting, authentic human achievement, professional sports photography, genuine celebration",
+    "Professional soccer player action shot, mid-kick during championship match, shot with Canon EOS-1D X Mark III, fast shutter speed, stadium lighting, ESPN quality sports photography",
+    "Professional rock climbing photography, athlete scaling cliff face, shot with Nikon D850, natural outdoor lighting, adventure sports photography, dramatic mountain landscape background"
   ],
   fashion: [
     "High-end fashion photography shoot, model in designer evening gown, shot in professional studio with Hasselblad H6D-100c, perfect lighting setup, Vogue magazine quality, authentic fashion photography, professional styling",
@@ -189,12 +195,13 @@ let errorCount = 0;
 
 async function generateImageForCategory(category, promptIndex) {
   const prompts = categoryPrompts[category.id];
-  if (!prompts || !prompts[promptIndex]) {
-    console.log(`❌ No prompt found for ${category.name} #${promptIndex + 1}`);
+  if (!prompts || prompts.length === 0) {
+    console.log(`❌ No prompts found for ${category.name}`);
     return false;
   }
 
-  const prompt = prompts[promptIndex];
+  // Cycle through available prompts for 20 images
+  const prompt = prompts[promptIndex % prompts.length];
   
   try {
     console.log(`🎨 Generating ultra-realistic image ${promptIndex + 1} for ${category.name}...`);
@@ -206,10 +213,9 @@ async function generateImageForCategory(category, promptIndex) {
         'Content-Type': 'application/json',
       },
               body: JSON.stringify({
-          prompt: prompt,
-          quality: 'hd', // Maximum quality
-          style: 'natural', // More realistic than 'vivid'
-          size: '1024x1024' // Square format for better compatibility and quality
+          prompt: `WIDE HORIZONTAL LANDSCAPE IMAGE: ${prompt}. CRITICAL: Must be landscape format - wider than tall, horizontal composition, panoramic view, wide aspect ratio. NO vertical/portrait elements.`,
+          quality: 'landscape', // Use landscape preset which forces 1792x1024 landscape
+          style: 'natural' // More realistic than 'vivid'
         }),
     });
 
@@ -223,24 +229,90 @@ async function generateImageForCategory(category, promptIndex) {
     if (data.success && data.image && data.image.url) {
       console.log(`✅ Generated photorealistic image for ${category.name} #${promptIndex + 1}`);
       
-      // Create professional title based on category
-      const professionalTitles = {
-        architecture: [`Modern Architectural Design`, `Historic Building Photography`, `Contemporary Structure`, `Architectural Masterpiece`],
-        lifestyle: [`Modern Lifestyle Scene`, `Contemporary Living`, `Wellness Photography`, `Urban Lifestyle`],
-        animals: [`Wildlife Photography`, `Animal Portrait`, `Nature Documentary`, `Wildlife Conservation`],
-        sports: [`Athletic Performance`, `Sports Action`, `Professional Athletics`, `Competitive Sports`],
-        fashion: [`Fashion Photography`, `Style Documentation`, `Designer Collection`, `Fashion Editorial`],
-        automotive: [`Automotive Excellence`, `Vehicle Photography`, `Transportation Design`, `Automotive Art`],
-        art: [`Contemporary Art`, `Artistic Expression`, `Creative Photography`, `Art Documentation`],
-        science: [`Scientific Research`, `Laboratory Work`, `Scientific Discovery`, `Research Photography`],
-        education: [`Educational Environment`, `Learning Space`, `Academic Photography`, `Educational Excellence`],
-        healthcare: [`Healthcare Professional`, `Medical Excellence`, `Healthcare Environment`, `Medical Photography`],
-        music: [`Musical Performance`, `Concert Photography`, `Music Production`, `Musical Art`]
+      // Create unique, SEO-friendly titles based on the actual prompts
+      const seoFriendlyTitles = {
+        architecture: [
+          `Modern Glass Office Building Golden Hour Architecture`,
+          `Ancient Roman Amphitheater Ruins Sunset Photography`,
+          `Luxury Minimalist Home Interior Real Estate`,
+          `Traditional Japanese Temple Documentary Architecture`
+        ],
+        lifestyle: [
+          `Young Professional Coffee Shop Workspace Lifestyle`,
+          `Morning Yoga Wellness Routine Modern Apartment`,
+          `Scandinavian Living Room Interior Design Photography`,
+          `Weekend Farmers Market Community Lifestyle Scene`,
+          `Family Dinner Gathering Multi-Generational Lifestyle`,
+          `Remote Work Home Office Mountain View Setup`
+        ],
+        animals: [
+          `African Lion Wildlife Photography Natural Habitat`,
+          `Golden Retriever Pet Portrait Autumn Park`,
+          `Colorful Macaw Rainforest Wildlife Costa Rica`,
+          `Wild Horses American Southwest Landscape Photography`,
+          `Elephant Family African Savanna Wildlife Documentary`,
+          `Cat Portrait Natural Window Light Pet Photography`
+        ],
+        sports: [
+          `Basketball Player Slam Dunk Sports Action`,
+          `Olympic Swimming Competition Underwater Photography`,
+          `Tennis Player Wimbledon Tournament Professional`,
+          `Marathon Runner Finish Line Victory Moment`,
+          `Soccer Player Championship Match Action Shot`,
+          `Rock Climbing Adventure Sports Mountain Photography`
+        ],
+        fashion: [
+          `Designer Evening Gown Fashion Studio Photography`,
+          `Milan Fashion Week Street Style Urban`,
+          `Luxury Fashion Accessories Designer Collection`,
+          `Fashion Runway Backstage Behind Scenes Photography`
+        ],
+        automotive: [
+          `Luxury Sports Car Mountain Road Photography`,
+          `Classic Vintage Automobile Car Show Restoration`,
+          `Modern Electric Vehicle Urban Sustainable Transport`,
+          `Motorcycle Highway Touring Adventure Photography`
+        ],
+        art: [
+          `Contemporary Art Gallery Exhibition Photography`,
+          `Artist Studio Creative Process Documentary`,
+          `Modern Sculpture Museum Installation Art`,
+          `Street Art Urban Mural Cultural Expression`
+        ],
+        science: [
+          `Modern Laboratory Scientific Research Photography`,
+          `Microscopy Research Laboratory Science Documentation`,
+          `Research Facility Architecture Scientific Building`,
+          `Field Research Environmental Science Documentation`
+        ],
+        education: [
+          `University Lecture Hall Educational Environment`,
+          `Library Study Academic Research Photography`,
+          `Graduation Ceremony Achievement Celebration`,
+          `Modern Classroom Interactive Technology Education`
+        ],
+        healthcare: [
+          `Modern Hospital Medical Facility Photography`,
+          `Healthcare Professional Medical Consultation`,
+          `Medical Equipment Hospital Technology`,
+          `Wellness Center Therapeutic Healthcare Environment`
+        ],
+        music: [
+          `Concert Hall Piano Performance Classical Music`,
+          `Recording Studio Music Production Professional`,
+          `Live Music Venue Band Performance Photography`,
+          `Vintage Guitar Musical Instrument Photography`
+        ]
       };
 
-      const title = professionalTitles[category.id] 
-        ? professionalTitles[category.id][promptIndex] || `Professional ${category.name} Photography`
+      // Generate unique, SEO-friendly title for each image
+      const baseTitle = seoFriendlyTitles[category.id] && seoFriendlyTitles[category.id][promptIndex] 
+        ? seoFriendlyTitles[category.id][promptIndex]
         : `Professional ${category.name} Photography`;
+      
+      // Add unique identifier for 20 images per category
+      const uniqueId = Math.random().toString(36).substr(2, 6).toUpperCase();
+      const title = `${baseTitle} ${uniqueId}`;
 
       // Download the image to get base64 data for saving
       console.log(`📥 Downloading image for ${category.name} #${promptIndex + 1}...`);
@@ -260,19 +332,20 @@ async function generateImageForCategory(category, promptIndex) {
           categoryId: category.id,
           title: title,
           description: `Professional ${category.name.toLowerCase()} photography captured with high-end equipment and expert composition. Perfect for commercial and editorial use.`,
-          dimensions: { width: 1024, height: 1024 }
+          dimensions: { width: 1792, height: 1024 }
         }),
       });
 
       if (saveResponse.ok) {
         console.log(`💾 Saved professional ${category.name} image to gallery`);
         successCount++;
-        totalCost += 0.08; // HD 1792x1024 cost estimate
+        totalCost += 0.08; // Landscape preset cost estimate
         return true;
       } else {
-        console.log(`⚠️  Generated but failed to save ${category.name} #${promptIndex + 1}`);
-        successCount++;
-        return true;
+        const errorData = await saveResponse.json().catch(() => ({ error: 'Unknown error' }));
+        console.log(`⚠️  Failed to save ${category.name} #${promptIndex + 1}: ${errorData.error || saveResponse.statusText}`);
+        errorCount++;
+        return false;
       }
     } else {
       throw new Error('Invalid response format');
@@ -287,22 +360,22 @@ async function generateImageForCategory(category, promptIndex) {
 async function generateImagesForAllCategories() {
   console.log(`\n🚀 Starting ULTRA-HIGH QUALITY image generation for ${missingCategories.length} categories...`);
   console.log(`📸 Professional photography quality - indistinguishable from real photos`);
-  console.log(`📊 Generating 4 photorealistic images per category = ${missingCategories.length * 4} total images`);
-  console.log(`🎯 Settings: HD quality (1792x1024), natural style, professional prompts\n`);
+  console.log(`📊 Generating 20 photorealistic images per category = ${missingCategories.length * 20} total images`);
+  console.log(`🎯 Settings: MAXIMUM HD quality (1792x1024), natural style, professional prompts\n`);
 
   for (const category of missingCategories) {
     console.log(`\n📂 Processing category: ${category.name}`);
     console.log(`   Description: ${category.description}`);
     console.log(`   Quality: Ultra-realistic professional photography`);
     
-    // Generate 4 images per category
-    for (let i = 0; i < 4; i++) {
+    // Generate 20 images per category
+    for (let i = 0; i < 20; i++) {
       await generateImageForCategory(category, i);
       
       // Delay between requests to ensure quality and avoid rate limiting
-      if (i < 3) {
+      if (i < 19) {
         console.log(`   ⏳ Processing next image...`);
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Reduced delay for efficiency
       }
     }
     
@@ -321,7 +394,7 @@ async function generateImagesForAllCategories() {
   console.log(`   ❌ Failed: ${errorCount} images`);
   console.log(`   💰 Estimated cost: $${totalCost.toFixed(2)}`);
   console.log(`   🏷️  Categories populated: ${missingCategories.length}`);
-  console.log(`   📸 Quality: Professional photography (HD 1792x1024)`);
+  console.log(`   📸 Quality: MAXIMUM resolution professional photography (1792x1024)`);
   console.log(`   🎯 Realism: Indistinguishable from authentic photography`);
   console.log(`\n🔄 Refresh your homepage to see the new professional categories!`);
   console.log(`🌟 All images are commercial-ready and professionally crafted!`);
