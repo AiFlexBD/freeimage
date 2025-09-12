@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 // Subscription plans configuration
-export const SUBSCRIPTION_PLANS = {
+const SUBSCRIPTION_PLANS = {
   free: {
     id: 'free',
     name: 'Free',
