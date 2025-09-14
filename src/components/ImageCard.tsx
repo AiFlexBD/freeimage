@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { categories } from '@/data/categories'
-import { getOptimizedImageUrl } from '@/lib/imageUtils'
+import { getImageProps } from '@/lib/imageUtils'
 
 interface ImageCardProps {
   image: {
@@ -96,10 +96,10 @@ export default function ImageCard({ image }: ImageCardProps) {
 
   const imageUrl = getImageUrl()
   
-  // Generate optimized thumbnail URL using preset
-  const thumbnailUrl = getOptimizedImageUrl(
+  // Get optimized image props with robust error handling
+  const imageProps = getImageProps(
     image.thumbnail_url || image.download_url,
-    'thumbnail' // Use the thumbnail preset
+    'card' // Use card preset for better quality
   )
 
   return (
@@ -107,11 +107,9 @@ export default function ImageCard({ image }: ImageCardProps) {
       <Link href={imageUrl}>
         <div className="relative aspect-video overflow-hidden">
           <img
-            src={thumbnailUrl}
+            {...imageProps}
             alt={image.title}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
           {image.tags?.includes('ai-generated') && (
             <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">

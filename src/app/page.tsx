@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import ImageCard from '@/components/ImageCard'
 import AdSense from '@/components/AdSense'
 import FluentLaneAd from '@/components/FluentLaneAd'
-import { getOptimizedImageUrl, preloadImages } from '@/lib/imageUtils'
+import { preloadImages } from '@/lib/imageUtils'
 import { categories } from '@/data/categories'
 
 interface DatabaseImage {
@@ -57,7 +57,7 @@ export default function HomePage() {
           const imagesToPreload = data.data.categories
             .slice(0, 4) // Only preload first 4 images
             .filter((cat: any) => cat.featuredImage)
-            .map((cat: any) => getOptimizedImageUrl(cat.featuredImage.thumbnail_url || cat.featuredImage.download_url, 'thumbnail'))
+            .map((cat: any) => cat.featuredImage.thumbnail_url || cat.featuredImage.download_url)
           
           if (imagesToPreload.length > 0) {
             preloadImages(imagesToPreload)
@@ -105,11 +105,18 @@ export default function HomePage() {
           <div 
             className="w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `linear-gradient(135deg, rgba(59, 130, 246, 0.75) 0%, rgba(147, 51, 234, 0.75) 100%), url("https://dalleproduse.blob.core.windows.net/private/images/5c3040f8-98ae-42b4-8803-a762896e58fb/generated_00.png?se=2025-09-13T00%3A34%3A59Z&sig=9buwCvQxqsid7E9bKIq4Bp4Mco73lUjIa%2BfvENIlCuM%3D&ske=2025-09-18T04%3A48%3A39Z&skoid=09ba021e-c417-441c-b203-c81e5dcd7b7f&sks=b&skt=2025-09-11T04%3A48%3A39Z&sktid=33e01921-4d64-4f8c-a055-5bdaffd5e33d&skv=2020-10-02&sp=r&spr=https&sr=b&sv=2020-10-02")`
+              backgroundImage: `linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(147, 51, 234, 0.8) 25%, rgba(236, 72, 153, 0.8) 50%, rgba(245, 101, 101, 0.8) 75%, rgba(251, 191, 36, 0.8) 100%)`
             }}
           >
+            {/* Animated Background Pattern */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
+              <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
+              <div className="absolute top-3/4 right-1/4 w-48 h-48 bg-white/5 rounded-full blur-xl"></div>
+              <div className="absolute bottom-1/4 left-1/3 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
+            </div>
             {/* Enhanced Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30"></div>
           </div>
         </div>
         
@@ -216,15 +223,20 @@ export default function HomePage() {
                   <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 relative overflow-hidden">
                     {category.featuredImage ? (
                       <img
-                        src={getOptimizedImageUrl(category.featuredImage.thumbnail_url || category.featuredImage.download_url, 'thumbnail')}
+                        src={category.featuredImage.thumbnail_url || category.featuredImage.download_url}
                         alt={category.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         loading={category.imageCount <= 4 ? "eager" : "lazy"} // Eager load first 4 categories
                         decoding="async"
                         onError={(e) => {
-                          // Fallback to placeholder on error
+                          // Fallback to original URL on error
                           const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
+                          const originalUrl = category.featuredImage?.thumbnail_url || category.featuredImage?.download_url
+                          if (originalUrl && target.src !== originalUrl) {
+                            target.src = originalUrl
+                          } else {
+                            target.style.display = 'none'
+                          }
                         }}
                       />
                     ) : (

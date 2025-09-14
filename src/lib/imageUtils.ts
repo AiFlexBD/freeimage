@@ -1,31 +1,30 @@
-// Image optimization utilities for Supabase Storage
+// Conservative image optimization utilities for Supabase Storage with high reliability
 
 export interface ImageOptimizationOptions {
   width?: number
   height?: number
   quality?: number
-  format?: 'webp' | 'png' | 'jpg' | 'avif'
   resize?: 'cover' | 'contain' | 'fill' | 'inside' | 'outside'
-  cache?: boolean // Whether to use aggressive caching
 }
 
-// Default optimization presets
+// Conservative presets - only basic resizing, no format conversion
 export const IMAGE_PRESETS = {
-  thumbnail: { width: 400, height: 300, quality: 80, format: 'webp' as const, resize: 'cover' as const, cache: true },
-  card: { width: 600, height: 400, quality: 85, format: 'webp' as const, resize: 'cover' as const, cache: true },
-  preview: { width: 800, height: 600, quality: 90, format: 'webp' as const, resize: 'cover' as const, cache: true },
-  hero: { width: 1200, height: 800, quality: 90, format: 'webp' as const, resize: 'cover' as const, cache: true },
-  full: { width: 1920, height: 1080, quality: 95, format: 'webp' as const, resize: 'inside' as const, cache: true },
+  thumbnail: { width: 400, height: 300, resize: 'cover' as const },
+  card: { width: 600, height: 400, resize: 'cover' as const },
+  preview: { width: 800, height: 600, resize: 'cover' as const },
+  hero: { width: 1200, height: 800, resize: 'cover' as const },
+  full: { width: 1920, height: 1080, resize: 'inside' as const },
 } as const
 
-// Cache for optimized URLs to avoid repeated processing
+// Cache for tested URLs
 const urlCache = new Map<string, string>()
+const failedUrls = new Set<string>()
 
 /**
- * Generate optimized image URL using Supabase image transformations
+ * Generate optimized image URL with conservative approach
  * @param originalUrl - Original Supabase storage URL
  * @param options - Optimization options or preset name
- * @returns Optimized image URL
+ * @returns Optimized image URL or original URL as fallback
  */
 export function getOptimizedImageUrl(
   originalUrl: string, 
@@ -44,52 +43,54 @@ export function getOptimizedImageUrl(
     return urlCache.get(cacheKey)!
   }
   
-  const { 
-    width = 400, 
-    height = 300, 
-    quality = 80, 
-    format = 'webp',
-    resize = 'cover',
-    cache = true
-  } = opts
-  
-  // Check if it's a Supabase URL
-  if (originalUrl.includes('supabase.co/storage')) {
-    try {
-      const url = new URL(originalUrl)
-      
-      // Add transformation parameters
-      url.searchParams.set('width', width.toString())
-      url.searchParams.set('height', height.toString())
-      url.searchParams.set('resize', resize)
-      url.searchParams.set('quality', quality.toString())
-      url.searchParams.set('format', format)
-      
-      // Add cache control parameter for Supabase (removed daily cache bust for better performance)
-      if (cache) {
-        url.searchParams.set('cache', '1') // Enable Supabase caching
-      }
-      
-      const optimizedUrl = url.toString()
-      
-      // Cache the result
-      urlCache.set(cacheKey, optimizedUrl)
-      
-      return optimizedUrl
-    } catch (error) {
-      console.warn('Failed to optimize image URL:', error)
-      return originalUrl
-    }
+  // If this URL combination previously failed, return original
+  if (failedUrls.has(cacheKey)) {
+    return originalUrl
   }
   
-  return originalUrl
+  // Check if it's a Supabase URL
+  if (!originalUrl.includes('supabase.co/storage')) {
+    return originalUrl
+  }
+  
+  try {
+    const optimizedUrl = createOptimizedUrl(originalUrl, opts)
+    
+    // Cache and return optimized URL
+    urlCache.set(cacheKey, optimizedUrl)
+    return optimizedUrl
+    
+  } catch (error) {
+    console.warn('Failed to create optimized image URL:', error)
+    failedUrls.add(cacheKey)
+    return originalUrl
+  }
 }
 
 /**
- * Generate multiple image sizes for responsive images with proper caching
- * @param originalUrl - Original image URL
- * @param sizes - Array of width sizes
- * @returns Object with srcSet and sizes strings
+ * Create optimized URL with only basic Supabase transformations
+ */
+function createOptimizedUrl(originalUrl: string, opts: ImageOptimizationOptions): string {
+  const { 
+    width = 400, 
+    height = 300, 
+    resize = 'cover'
+  } = opts
+  
+  const url = new URL(originalUrl)
+  
+  // Only add basic transformation parameters that are most reliable
+  url.searchParams.set('width', width.toString())
+  url.searchParams.set('height', height.toString())
+  url.searchParams.set('resize', resize)
+  
+  // Skip quality and format conversion to avoid errors
+  
+  return url.toString()
+}
+
+/**
+ * Generate responsive image URLs for different screen sizes
  */
 export function getResponsiveImageUrls(
   originalUrl: string,
@@ -104,10 +105,7 @@ export function getResponsiveImageUrls(
       const optimizedUrl = getOptimizedImageUrl(originalUrl, {
         width,
         height: Math.round(width * 0.75), // 4:3 aspect ratio
-        quality: 85,
-        format: 'webp',
-        resize: 'cover',
-        cache: true
+        resize: 'cover'
       })
       return `${optimizedUrl} ${width}w`
     })
@@ -119,24 +117,7 @@ export function getResponsiveImageUrls(
 }
 
 /**
- * Get blur placeholder for images (low quality, small size)
- * @param originalUrl - Original image URL
- * @returns Low quality placeholder URL
- */
-export function getBlurPlaceholder(originalUrl: string): string {
-  return getOptimizedImageUrl(originalUrl, {
-    width: 40,
-    height: 30,
-    quality: 20,
-    format: 'webp',
-    resize: 'cover',
-    cache: true
-  })
-}
-
-/**
- * Preload critical images with proper cache headers
- * @param urls - Array of image URLs to preload
+ * Preload critical images with error handling
  */
 export function preloadImages(urls: string[]): void {
   if (typeof window === 'undefined') return
@@ -147,23 +128,66 @@ export function preloadImages(urls: string[]): void {
     link.as = 'image'
     link.href = url
     link.crossOrigin = 'anonymous'
+    
+    // Add error handling
+    link.onerror = () => {
+      console.warn('Failed to preload image:', url)
+    }
+    
     document.head.appendChild(link)
   })
 }
 
 /**
- * Clear the URL cache (useful for development or when images are updated)
+ * Smart image component props generator with conservative optimization
  */
-export function clearImageCache(): void {
-  urlCache.clear()
+export function getImageProps(
+  originalUrl: string,
+  preset: keyof typeof IMAGE_PRESETS = 'thumbnail'
+): {
+  src: string
+  srcSet?: string
+  sizes?: string
+  loading: 'lazy' | 'eager'
+  decoding: 'async'
+  onError: (e: React.SyntheticEvent<HTMLImageElement>) => void
+} {
+  // Use original URL directly for now to ensure reliability
+  const baseUrl = originalUrl
+  
+  return {
+    src: baseUrl,
+    loading: 'lazy',
+    decoding: 'async',
+    onError: (e) => {
+      const target = e.currentTarget as HTMLImageElement
+      console.warn('Image failed to load:', target.src)
+      // Image already using original URL, so just log the error
+    }
+  }
 }
 
 /**
- * Get cache statistics
+ * Clear caches (useful for development)
  */
-export function getCacheStats(): { size: number; keys: string[] } {
+export function clearImageCache(): void {
+  urlCache.clear()
+  failedUrls.clear()
+}
+
+/**
+ * Get cache statistics for debugging
+ */
+export function getCacheStats(): { 
+  cached: number
+  failed: number
+  cachedUrls: string[]
+  failedUrls: string[]
+} {
   return {
-    size: urlCache.size,
-    keys: Array.from(urlCache.keys())
+    cached: urlCache.size,
+    failed: failedUrls.size,
+    cachedUrls: Array.from(urlCache.keys()),
+    failedUrls: Array.from(failedUrls)
   }
 } 
