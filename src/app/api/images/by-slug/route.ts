@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Query for single image by slug (if slug column exists) or by title slug
-    let foundImage = null;
-    let relatedImages = [];
+    let foundImage: any = null;
+    let relatedImages: any[] = [];
 
     // First try to query by slug column if it exists
     const { data: imageBySlug, error: slugError } = await supabase

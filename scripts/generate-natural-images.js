@@ -10,6 +10,9 @@ const supabase = createClient(
 
 // Categories that need more images (less than 20 images each)
 const missingCategories = [
+  { id: 'space', name: 'Space', target: 20, current: 0 },
+  { id: 'pixel-art', name: 'Pixel Art', target: 20, current: 0 },
+  { id: 'anime', name: 'Anime', target: 20, current: 0 },
   { id: 'architecture', name: 'Architecture', target: 25, current: 8 },
   { id: 'business', name: 'Business', target: 25, current: 10 },
   { id: 'food', name: 'Food', target: 25, current: 10 },
@@ -25,6 +28,50 @@ const missingCategories = [
 
 // Natural, realistic prompts - no "professional" or technical jargon
 const naturalPrompts = {
+  space: [
+    "Stunning space photography of a massive spiral galaxy with swirling arms of stars, gas, and dust against the deep black cosmos. Captured with Hubble Space Telescope, ultra-high resolution, cosmic colors of blues, purples, and golds, professional astronomical photography",
+    "Breathtaking nebula image showing colorful clouds of gas and dust where new stars are being born, with vibrant reds, blues, and greens creating a cosmic masterpiece. Space telescope photography with incredible detail and cosmic beauty",
+    "Epic view of Earth from space showing the blue planet with white clouds, continents, and the thin atmosphere against the blackness of space. Astronaut photography from International Space Station, high-resolution, awe-inspiring perspective",
+    "Dramatic solar system view with multiple planets aligned, showing the gas giants Jupiter and Saturn with their moons, against a starfield background. Space photography with planetary details and cosmic scale",
+    "Beautiful aurora borealis from space showing green and purple lights dancing across Earth's polar regions, captured from satellite orbit. Space photography with atmospheric phenomena and cosmic lighting",
+    "Stunning black hole visualization showing the event horizon with glowing accretion disk and gravitational lensing effects. Scientific space art with cosmic physics and dramatic lighting",
+    "Magnificent star cluster with thousands of young blue stars shining brightly against dark nebula clouds. Deep space photography with stellar formation and cosmic colors",
+    "Epic supernova explosion showing massive stellar death with expanding shock waves and brilliant light. Space photography capturing cosmic destruction and rebirth",
+    "Beautiful comet with long tail streaking across the starfield, captured during close approach to Earth. Astronomical photography with cosmic motion and celestial beauty",
+    "Stunning planetary ring system around a gas giant with intricate details of ice particles and gaps, illuminated by distant star. Space photography with planetary science and cosmic structure",
+    "Breathtaking galaxy collision showing two massive galaxies merging with streams of stars and gas being pulled between them. Deep space photography with cosmic evolution and gravitational forces",
+    "Magnificent space station orbiting Earth with solar panels gleaming in sunlight, against the backdrop of our blue planet. Space photography with human technology and cosmic perspective",
+    "Stunning Mars landscape showing red rocky terrain, ancient river valleys, and distant mountains under a pink sky. Planetary photography with Martian geology and alien beauty",
+    "Epic view of Saturn's moon Enceladus with geysers of water ice shooting into space from its south pole. Space photography with cryovolcanism and moon geology",
+    "Beautiful exoplanet orbiting a distant star, showing potential for life with blue oceans and white clouds. Space art with astrobiology and cosmic imagination",
+    "Stunning view of the Milky Way galaxy from within, showing the dense star field and dark dust lanes. Galactic photography with stellar density and cosmic structure",
+    "Magnificent solar flare erupting from the Sun's surface with massive loops of plasma and magnetic fields. Solar photography with stellar activity and cosmic energy",
+    "Beautiful asteroid belt showing rocky debris from planet formation, with sunlight glinting off metallic surfaces. Space photography with solar system formation and cosmic debris",
+    "Epic view of Jupiter's Great Red Spot with swirling storm clouds and atmospheric bands in beautiful colors. Planetary photography with gas giant weather and cosmic storms",
+    "Stunning view of the Andromeda Galaxy approaching the Milky Way, showing the future collision of our galaxies. Deep space photography with cosmic destiny and galactic evolution"
+  ],
+  'pixel-art': [
+    "Retro pixel art of a classic 8-bit fantasy castle with turrets, flags, and medieval architecture in vibrant colors. Nostalgic gaming art style with detailed pixel work and classic RPG aesthetics",
+    "Cute pixel art character of a small dragon with big eyes, sitting in a magical forest clearing with mushrooms and flowers. 8-bit art style with adorable character design and fantasy elements",
+    "Pixel art cityscape showing a cyberpunk metropolis with neon signs, flying cars, and towering buildings in retro-futuristic style. Classic arcade game art with vibrant colors and sci-fi atmosphere",
+    "Beautiful pixel art landscape of a peaceful village with houses, trees, and a winding river under a starry night sky. 8-bit art style with cozy atmosphere and nostalgic charm",
+    "Epic pixel art battle scene with a knight fighting a dragon in a medieval fantasy setting with dramatic lighting and action poses. Classic RPG art style with detailed pixel animation",
+    "Cute pixel art of a cat sitting on a windowsill looking at falling snowflakes outside, with warm indoor lighting. 8-bit art style with cozy winter atmosphere and adorable character",
+    "Retro pixel art spaceship flying through an asteroid field with colorful rocks and distant stars in the background. Classic space shooter art style with vibrant colors and cosmic adventure",
+    "Pixel art wizard casting a spell with glowing magical effects, standing in a mystical library with floating books and crystals. Fantasy 8-bit art with magical atmosphere and detailed effects",
+    "Beautiful pixel art garden with blooming flowers, butterflies, and a small pond with koi fish swimming peacefully. 8-bit art style with nature beauty and serene atmosphere",
+    "Epic pixel art boss battle showing a massive robot fighting a small hero character in a futuristic arena. Classic arcade game art with dramatic scale and action-packed scene",
+    "Cute pixel art of a robot and a cat becoming friends in a cozy workshop with tools and gadgets scattered around. 8-bit art style with heartwarming story and detailed character interaction",
+    "Retro pixel art dungeon with stone walls, torches, treasure chests, and mysterious shadows creating an adventurous atmosphere. Classic RPG art style with exploration and mystery",
+    "Beautiful pixel art sunset over a pixelated ocean with waves, seagulls, and a distant lighthouse on a rocky cliff. 8-bit art style with peaceful coastal atmosphere and warm colors",
+    "Epic pixel art mecha battle with giant robots fighting in a destroyed city with explosions and dramatic lighting effects. Classic mecha anime art style with detailed mechanical design",
+    "Cute pixel art of a magical girl transforming with sparkles and colorful effects, standing in a flower field. 8-bit art style with magical transformation and vibrant colors",
+    "Retro pixel art racing car speeding through a neon-lit tunnel with motion blur effects and colorful lights. Classic arcade racing art with speed and excitement",
+    "Beautiful pixel art mountain landscape with snow-capped peaks, pine trees, and a crystal-clear lake reflecting the sky. 8-bit art style with natural beauty and peaceful atmosphere",
+    "Epic pixel art space battle with multiple ships fighting among asteroids and space stations with laser beams and explosions. Classic space combat art with action and cosmic warfare",
+    "Cute pixel art of a bakery with warm light coming from windows, showing bread, pastries, and a friendly baker character. 8-bit art style with cozy atmosphere and delicious details",
+    "Retro pixel art of a ninja character sneaking through a bamboo forest with moonlight filtering through leaves. Classic stealth game art with shadows and mysterious atmosphere"
+  ],
   architecture: [
     "Ultra-realistic architectural photography of modern glass skyscraper with geometric patterns reflecting golden hour light. Shot with Canon EOS R5, 24-70mm lens, f/8, shallow depth of field, high-resolution, cinematic detail, crisp textures, professional architectural photography",
     "Stunning contemporary building facade with clean lines and dramatic shadows. Captured with Sony A7R IV, 16-35mm wide-angle lens, f/11, perfect exposure, high-resolution, architectural detail, professional real estate photography",
@@ -300,11 +347,77 @@ const naturalPrompts = {
     "Music festival photography of a large outdoor concert stage with colorful stage lights, powerful speaker systems, and festival atmosphere prepared for live music performance with crowd barriers and festival infrastructure visible. The stage represents live music culture and festival entertainment. Captured with Nikon Z7 II, 24-70mm f/2.8 lens, festival lighting to show concert stage scale and live music infrastructure. Professional music festival photography with concert performance and live music entertainment",
     "Classical music photography of an elegant cello leaning against a wall in a quiet practice room with sheet music, music stand, and peaceful musical practice environment showing string instrument beauty and musical solitude. The cello represents classical string music and individual musical practice. Shot with Sony A7R IV, 85mm f/1.4 lens, natural lighting to show cello craftsmanship and practice room atmosphere. Professional string instrument photography with classical music and musical practice",
     "Street music photography of a talented street musician playing acoustic guitar with an open guitar case for tips, showing authentic street performance, musical busking culture, and public musical expression in an urban setting. The musician represents grassroots music culture and public musical performance. Captured with Canon 5D Mark IV, 50mm f/1.8 lens, natural street lighting to show street music authenticity and urban musical culture. Professional street music photography with busking culture and public musical performance"
+  ],
+  anime: [
+    "Beautiful anime cityscape view of a bustling metropolis at sunset with towering skyscrapers, neon signs, and busy streets filled with people. Cartoon anime art style with warm golden lighting, detailed city architecture, and vibrant urban atmosphere",
+    "Stunning anime city view from a high rooftop showing a futuristic skyline with flying cars, holographic billboards, and glowing buildings against a starry night sky. Cyberpunk anime art style with neon colors and sci-fi city design",
+    "Charming anime cityscape of a traditional Japanese town with wooden buildings, cherry blossom trees, and lantern-lit streets during evening. Studio Ghibli-inspired anime art style with soft colors and nostalgic atmosphere",
+    "Epic anime city view of a fantasy metropolis with floating islands, magical towers, and bridges connecting different districts. Fantasy anime art style with mystical lighting and imaginative architecture",
+    "Trendy anime character with modern street fashion - a cool teenager with dyed blue hair, oversized hoodie, and stylish sneakers, standing in a neon-lit urban setting. Contemporary anime art style with vibrant colors and dynamic lighting",
+    "Kawaii anime girl with pastel pink hair in twin buns, wearing a cute lolita dress with frills and bows, holding a plush toy in a pastel-colored room. Modern anime art style with soft lighting and adorable character design",
+    "Badass anime character with silver hair and cyberpunk outfit, wearing a leather jacket with glowing LED accents, standing in a futuristic cityscape. High-quality anime art with neon lighting and detailed character design",
+    "Trendy anime boy with messy black hair and casual streetwear, wearing a graphic t-shirt and ripped jeans, sitting in a trendy cafe with latte art. Modern slice-of-life anime style with warm lighting and relatable character design",
+    "Anime character with rainbow-colored hair and gothic lolita fashion, wearing a black and white dress with lace details, standing in a gothic cathedral setting. Dark fantasy anime art style with dramatic lighting and intricate character design",
+    "Cool anime character with spiky red hair and sports uniform, wearing a basketball jersey and sneakers, mid-action pose on a court. Dynamic sports anime style with motion lines and energetic character design",
+    "Trendy anime girl with long purple hair and modern kawaii fashion, wearing a crop top and high-waisted shorts, posing in a colorful bedroom with LED lights. Contemporary anime art with vibrant colors and social media-ready aesthetics",
+    "Anime character with white hair and elegant formal wear, wearing a tailored suit with subtle accessories, standing in a modern office setting. Professional anime art style with clean lines and sophisticated character design",
+    "Cute anime character with short brown hair and casual summer outfit, wearing a sundress and sandals, walking through a flower garden. Wholesome anime art style with natural lighting and cheerful character design",
+    "Trendy anime character with multicolored hair and alternative fashion, wearing a punk-style outfit with chains and studs, standing in a music venue. Edgy anime art style with dramatic lighting and rebellious character design",
+    "Anime character with long silver hair and fantasy outfit, wearing a flowing robe with magical accessories, standing in a mystical forest. Fantasy anime art style with ethereal lighting and magical character design",
+    "Modern anime character with short pink hair and techwear outfit, wearing a futuristic jacket with digital displays, standing in a high-tech environment. Sci-fi anime art style with neon lighting and cyberpunk aesthetics",
+    "Trendy anime character with curly orange hair and vintage fashion, wearing a retro outfit with classic accessories, posing in a nostalgic setting. Vintage anime art style with warm colors and timeless character design",
+    "Anime character with long black hair and elegant kimono, wearing traditional Japanese clothing with modern touches, standing in a traditional garden. Cultural anime art style with natural lighting and refined character design",
+    "Cool anime character with spiky blonde hair and casual streetwear, wearing a hoodie and joggers, sitting on a rooftop with city view. Urban anime art style with cityscape background and relaxed character design",
+    "Trendy anime character with short blue hair and sporty outfit, wearing athletic wear with brand logos, mid-workout pose in a modern gym. Fitness anime art style with dynamic poses and energetic character design"
   ]
 };
 
 // Unique, meaningful titles for each category (no repetitive words)
 const uniqueTitles = {
+  space: [
+    "Spiral Galaxy Swirl",
+    "Colorful Nebula Birth",
+    "Earth Blue Planet",
+    "Solar System Planets",
+    "Aurora Polar Lights",
+    "Black Hole Horizon",
+    "Star Cluster Blue",
+    "Supernova Explosion",
+    "Comet Tail Streak",
+    "Planetary Ring System",
+    "Galaxy Collision Merge",
+    "Space Station Orbit",
+    "Mars Red Landscape",
+    "Enceladus Ice Geysers",
+    "Exoplanet Blue Oceans",
+    "Milky Way Starfield",
+    "Solar Flare Plasma",
+    "Asteroid Belt Rocks",
+    "Jupiter Red Spot",
+    "Andromeda Galaxy Approach"
+  ],
+  'pixel-art': [
+    "Fantasy Castle Turrets",
+    "Cute Dragon Forest",
+    "Cyberpunk City Neon",
+    "Village River Night",
+    "Knight Dragon Battle",
+    "Cat Snow Window",
+    "Spaceship Asteroid Field",
+    "Wizard Spell Library",
+    "Garden Pond Koi",
+    "Robot Boss Arena",
+    "Robot Cat Friends",
+    "Dungeon Torch Shadows",
+    "Ocean Sunset Lighthouse",
+    "Mecha Battle City",
+    "Magical Girl Transform",
+    "Racing Car Tunnel",
+    "Mountain Lake Reflection",
+    "Space Battle Ships",
+    "Bakery Warm Light",
+    "Ninja Bamboo Moon"
+  ],
   lifestyle: [
     "Golden Hour Coffee Shop Reading",
     "Family Kitchen Cooking Joy",
@@ -524,17 +637,53 @@ const uniqueTitles = {
     "Speaker Light Colorful",
     "Wall Practice Lean",
     "Case Open Play"
+  ],
+  anime: [
+    "Sunset Metropolis Skyline",
+    "Cyberpunk Night City",
+    "Traditional Japanese Town",
+    "Fantasy Floating Islands",
+    "Trendy Blue Hair Street",
+    "Kawaii Pink Twin Buns",
+    "Badass Cyberpunk Silver",
+    "Casual Black Hair Cafe",
+    "Gothic Rainbow Cathedral",
+    "Sports Red Hair Court",
+    "Purple Hair LED Room",
+    "Elegant White Suit",
+    "Brown Hair Garden Walk",
+    "Punk Multicolor Music",
+    "Silver Fantasy Forest",
+    "Pink Techwear Future",
+    "Orange Vintage Retro",
+    "Black Kimono Garden",
+    "Blonde Rooftop City",
+    "Blue Sporty Gym"
   ]
 };
 
 let totalGenerated = 0;
 let totalCost = 0;
 
-// Generate unique natural title (no AI tags, no numbers)
-function generateUniqueTitle(category, index) {
+// Generate unique natural title from prompt (no AI tags, no numbers)
+function generateUniqueTitle(category, index, prompt) {
   const titles = uniqueTitles[category] || [];
-  const baseTitle = titles[index] || `${category.charAt(0).toUpperCase() + category.slice(1)} Scene`;
-  return baseTitle;
+  
+  // If we have a predefined title, use it
+  if (titles[index]) {
+    return titles[index];
+  }
+  
+  // Otherwise, create a unique title from the prompt
+  const words = prompt.split(' ').slice(0, 6); // Take first 6 words
+  const title = words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+    .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters
+    .trim();
+  
+  // Add index to make it unique if needed
+  return index > 0 ? `${title} ${index + 1}` : title;
 }
 
 // Generate image using Azure OpenAI DALL-E 3
@@ -564,7 +713,7 @@ async function generateWithDallE(prompt, category, index) {
       const imageBase64 = `data:image/png;base64,${Buffer.from(imageBuffer).toString('base64')}`;
 
       // Save with unique natural title
-      const title = generateUniqueTitle(category, index);
+      const title = generateUniqueTitle(category, index, prompt);
       
       // Create slug from title
       const slug = title
@@ -582,7 +731,7 @@ async function generateWithDallE(prompt, category, index) {
           prompt: prompt,
           categoryId: category,
           title: title,
-          description: `Natural ${category} scene captured with realistic lighting and composition. Generated using GPT-Image-1 model via Azure.`,
+          description: prompt, // Use the detailed prompt as description
           dimensions: { width: 1792, height: 1024 },
           tags: ['gpt-image-1', 'azure', 'natural', 'realistic', category],
           slug: slug

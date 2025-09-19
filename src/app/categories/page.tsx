@@ -41,25 +41,47 @@ export default function CategoriesPage() {
     try {
       setLoading(true)
       
-      const response = await fetch('/api/images?limit=1000')
-      const data = await response.json()
+      // Fetch categories from API
+      const categoriesResponse = await fetch('/api/categories')
+      const categoriesData = await categoriesResponse.json()
       
-      if (data.success) {
-        const allImages = data.images
-        setTotalImages(allImages.length)
+      if (Array.isArray(categoriesData)) {
+        // Fetch images to get sample images for each category
+        const imagesResponse = await fetch('/api/images?limit=1000')
+        const imagesData = await imagesResponse.json()
         
-        const categoriesData = categories.map(category => {
-          const categoryImages = allImages.filter((img: DatabaseImage) => img.category_id === category.id)
-          const firstImage = categoryImages[0]
+        if (imagesData.success) {
+          const allImages = imagesData.images
+          setTotalImages(allImages.length)
           
-          return {
-            ...category,
-            realImageCount: categoryImages.length,
-            realImage: firstImage
-          }
-        })
-        
-        setCategoriesWithStats(categoriesData)
+          const categoriesWithStats = categoriesData.map(category => {
+            const categoryImages = allImages.filter((img: DatabaseImage) => img.category_id === category.id)
+            const firstImage = categoryImages[0]
+            
+            return {
+              id: category.id,
+              name: category.name,
+              slug: category.slug,
+              description: category.description || `${category.name} images`,
+              realImageCount: category.image_count || categoryImages.length,
+              realImage: firstImage
+            }
+          })
+          
+          setCategoriesWithStats(categoriesWithStats)
+        } else {
+          // Fallback: use categories without images
+          const categoriesWithStats = categoriesData.map(category => ({
+            id: category.id,
+            name: category.name,
+            slug: category.slug,
+            description: category.description || `${category.name} images`,
+            realImageCount: category.image_count || 0,
+            realImage: undefined
+          }))
+          
+          setCategoriesWithStats(categoriesWithStats)
+        }
       } else {
         setError('Failed to load categories')
       }

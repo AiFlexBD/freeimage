@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { categories } from '@/data/categories'
 import { getImageProps } from '@/lib/imageUtils'
 
 interface ImageCardProps {
@@ -31,11 +30,11 @@ export default function ImageCard({ image }: ImageCardProps) {
   }
 
   const getImageUrl = () => {
-    const category = categories.find(c => c.id === image.category_id)
+    // Use category data from the image object (fetched from database)
     const titleSlug = createSlug(image.title)
     
-    if (category) {
-      return `/image/${category.slug}/${titleSlug}`
+    if (image.categories?.slug) {
+      return `/image/${image.categories.slug}/${titleSlug}`
     }
     
     // Fallback to old URL structure if category not found

@@ -37,6 +37,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [category, setCategory] = useState<any>(null)
   const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
@@ -45,17 +46,49 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
     hasNextPage: false,
     hasPrevPage: false
   })
-  
-  const category = categories.find(c => c.slug === params.slug)
+
+  useEffect(() => {
+    fetchCategory()
+  }, [params.slug])
 
   useEffect(() => {
     if (category) {
       fetchCategoryImages()
-    } else {
-      setError('Category not found')
+    }
+  }, [category, currentPage])
+
+  const fetchCategory = async () => {
+    try {
+      setLoading(true)
+      
+      // First try to find in static categories
+      const staticCategory = categories.find(c => c.slug === params.slug)
+      if (staticCategory) {
+        setCategory(staticCategory)
+        return
+      }
+      
+      // If not found, fetch from API
+      const response = await fetch('/api/categories')
+      const categoriesData = await response.json()
+      
+      if (Array.isArray(categoriesData)) {
+        const foundCategory = categoriesData.find(c => c.slug === params.slug)
+        if (foundCategory) {
+          setCategory(foundCategory)
+        } else {
+          setError('Category not found')
+        }
+      } else {
+        setError('Failed to load category')
+      }
+    } catch (err) {
+      setError('Failed to load category')
+      console.error('Error fetching category:', err)
+    } finally {
       setLoading(false)
     }
-  }, [params.slug, category, currentPage])
+  }
 
   const fetchCategoryImages = async () => {
     if (!category) return
