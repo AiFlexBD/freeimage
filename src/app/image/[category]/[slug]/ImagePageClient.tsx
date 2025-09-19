@@ -40,32 +40,15 @@ export default function ImagePageClient({ params }: { params: { category: string
     try {
       setLoading(true)
       
-      // Fetch all images and find by category and slug
-      const response = await fetch(`/api/images?limit=200`)
+      // Use the new efficient API endpoint
+      const response = await fetch(`/api/images/by-slug?category=${params.category}&slug=${params.slug}`)
       const data = await response.json()
       
       if (data.success) {
-        // Find image by category and slug
-        const foundImage = data.images.find((img: DatabaseImage) => {
-          const imageSlug = createSlug(img.title)
-          const category = categories.find(c => c.id === img.category_id)
-          return category?.slug === params.category && imageSlug === params.slug
-        })
-        
-        if (foundImage) {
-          setImage(foundImage)
-          
-          // Fetch related images from the same category
-          const related = data.images.filter((img: DatabaseImage) => 
-            img.category_id === foundImage.category_id && img.id !== foundImage.id
-          ).slice(0, 4)
-          
-          setRelatedImages(related)
-        } else {
-          setError('Image not found')
-        }
+        setImage(data.image)
+        setRelatedImages(data.relatedImages || [])
       } else {
-        setError('Failed to load image')
+        setError(data.error || 'Image not found')
       }
     } catch (err) {
       setError('Failed to load image')

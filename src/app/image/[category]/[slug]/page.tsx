@@ -27,64 +27,52 @@ export async function generateMetadata({ params }: { params: { category: string;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   
   try {
-    // Fetch image data for metadata
-    const response = await fetch(`${baseUrl}/api/images?limit=200`, { cache: 'no-store' })
+    // Use the new efficient API endpoint
+    const response = await fetch(`${baseUrl}/api/images/by-slug?category=${params.category}&slug=${params.slug}`, { cache: 'no-store' })
     const data = await response.json()
     
-    if (data.success) {
-      const foundImage = data.images.find((img: DatabaseImage) => {
-        const imageSlug = img.title
-          .toLowerCase()
-          .replace(/[^a-z0-9 -]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/-+/g, '-')
-          .trim()
-        const category = categories.find(c => c.id === img.category_id)
-        return category?.slug === params.category && imageSlug === params.slug
-      })
+    if (data.success && data.image) {
+      const foundImage = data.image
+      const category = categories.find(c => c.id === foundImage.category_id)
+      const title = `${foundImage.title} - Free ${category?.name} Image Download`
+      const description = `Download ${foundImage.title.toLowerCase()} for free. High-quality ${category?.name.toLowerCase()} image perfect for commercial and personal use. AI-generated, royalty-free.`
       
-      if (foundImage) {
-        const category = categories.find(c => c.id === foundImage.category_id)
-        const title = `${foundImage.title} - Free ${category?.name} Image Download`
-        const description = `Download ${foundImage.title.toLowerCase()} for free. High-quality ${category?.name.toLowerCase()} image perfect for commercial and personal use. AI-generated, royalty-free.`
-        
-        return {
+      return {
+        title,
+        description,
+        keywords: [
+          foundImage.title.toLowerCase(),
+          `${category?.name.toLowerCase()} images`,
+          'free download',
+          'AI generated',
+          'royalty free',
+          'commercial use',
+          'high resolution',
+          ...(foundImage.tags || [])
+        ],
+        openGraph: {
           title,
           description,
-          keywords: [
-            foundImage.title.toLowerCase(),
-            `${category?.name.toLowerCase()} images`,
-            'free download',
-            'AI generated',
-            'royalty free',
-            'commercial use',
-            'high resolution',
-            ...(foundImage.tags || [])
+          type: 'website',
+          url: `${baseUrl}/image/${params.category}/${params.slug}`,
+          images: [
+            {
+              url: foundImage.download_url,
+              width: foundImage.width || 1024,
+              height: foundImage.height || 1024,
+              alt: foundImage.title,
+            },
           ],
-          openGraph: {
-            title,
-            description,
-            type: 'website',
-            url: `${baseUrl}/image/${params.category}/${params.slug}`,
-            images: [
-              {
-                url: foundImage.download_url,
-                width: foundImage.width || 1024,
-                height: foundImage.height || 1024,
-                alt: foundImage.title,
-              },
-            ],
-          },
-          twitter: {
-            card: 'summary_large_image',
-            title,
-            description,
-            images: [foundImage.download_url],
-          },
-          alternates: {
-            canonical: `/image/${params.category}/${params.slug}`,
-          },
-        }
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title,
+          description,
+          images: [foundImage.download_url],
+        },
+        alternates: {
+          canonical: `/image/${params.category}/${params.slug}`,
+        },
       }
     }
   } catch (error) {

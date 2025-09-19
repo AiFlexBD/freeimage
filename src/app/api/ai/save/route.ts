@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log('Save API: Starting request...')
     
-    const { imageData, prompt, categoryId, title, description, tags, dimensions } = await request.json()
+    const { imageData, prompt, categoryId, title, description, tags, dimensions, slug } = await request.json()
     console.log('Save API: Request data received:', { 
       hasImageData: !!imageData, 
       prompt: prompt?.substring(0, 50), 
@@ -129,7 +129,8 @@ export async function POST(request: NextRequest) {
         download_url: publicUrl,
         thumbnail_url: thumbnailUrl,
         downloads: 0,
-        is_featured: false
+        is_featured: false,
+        slug: slug
       })
       .select()
       .single()

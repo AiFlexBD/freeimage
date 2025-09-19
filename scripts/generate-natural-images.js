@@ -8,22 +8,79 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Categories that need images
+// Categories that need more images (less than 20 images each)
 const missingCategories = [
-  { id: 'lifestyle', name: 'Lifestyle' },
-  { id: 'animals', name: 'Animals' },
-  { id: 'sports', name: 'Sports' },
-  { id: 'fashion', name: 'Fashion' },
-  { id: 'automotive', name: 'Automotive' },
-  { id: 'art', name: 'Art' },
-  { id: 'science', name: 'Science' },
-  { id: 'education', name: 'Education' },
-  { id: 'healthcare', name: 'Healthcare' },
-  { id: 'music', name: 'Music' }
+  { id: 'architecture', name: 'Architecture', target: 25, current: 8 },
+  { id: 'business', name: 'Business', target: 25, current: 10 },
+  { id: 'food', name: 'Food', target: 25, current: 10 },
+  { id: 'people', name: 'People', target: 25, current: 10 },
+  { id: 'travel', name: 'Travel', target: 25, current: 10 },
+  { id: 'abstract', name: 'Abstract', target: 25, current: 11 },
+  { id: 'nature', name: 'Nature', target: 25, current: 12 },
+  { id: 'technology', name: 'Technology', target: 25, current: 13 },
+  { id: 'science', name: 'Science', target: 25, current: 18 },
+  { id: 'healthcare', name: 'Healthcare', target: 25, current: 19 },
+  { id: 'music', name: 'Music', target: 25, current: 19 }
 ];
 
 // Natural, realistic prompts - no "professional" or technical jargon
 const naturalPrompts = {
+  architecture: [
+    "Ultra-realistic architectural photography of modern glass skyscraper with geometric patterns reflecting golden hour light. Shot with Canon EOS R5, 24-70mm lens, f/8, shallow depth of field, high-resolution, cinematic detail, crisp textures, professional architectural photography",
+    "Stunning contemporary building facade with clean lines and dramatic shadows. Captured with Sony A7R IV, 16-35mm wide-angle lens, f/11, perfect exposure, high-resolution, architectural detail, professional real estate photography",
+    "Futuristic building design with innovative materials and sustainable features. Photographed with Nikon Z9, 14-24mm lens, f/9, golden hour lighting, high-resolution, architectural photography, magazine quality",
+    "Historic building restoration with modern elements blending seamlessly. Shot with Canon EOS R6, 50mm lens, f/5.6, natural lighting, high-resolution, architectural detail, professional photography",
+    "Minimalist modern home with clean geometric forms and natural materials. Captured with Sony A7R V, 35mm lens, f/7.1, soft natural light, high-resolution, architectural photography, lifestyle magazine quality"
+  ],
+  business: [
+    "Professional business meeting in modern conference room with glass walls and city view. Shot with Canon EOS R5, 85mm lens, f/2.8, natural lighting, high-resolution, corporate photography, professional atmosphere",
+    "Successful entrepreneur working in sleek modern office with laptop and coffee. Captured with Sony A7R IV, 50mm lens, f/4, soft window light, high-resolution, business lifestyle photography, magazine quality",
+    "Handshake between business partners in contemporary office lobby. Photographed with Nikon Z9, 70-200mm lens, f/5.6, professional lighting, high-resolution, corporate photography, authentic moment",
+    "Team collaboration in open-plan office with natural light and modern furniture. Shot with Canon EOS R6, 24-70mm lens, f/6.3, ambient lighting, high-resolution, workplace photography, professional quality",
+    "Business presentation with charts and graphs on large screen in boardroom. Captured with Sony A7R V, 35mm lens, f/8, controlled lighting, high-resolution, corporate photography, professional atmosphere"
+  ],
+  food: [
+    "Gourmet dish presentation with fresh ingredients and artistic plating. Shot with Canon EOS R5, 100mm macro lens, f/4, natural lighting, high-resolution, food photography, restaurant quality, shallow depth of field",
+    "Fresh organic vegetables arranged beautifully on wooden cutting board. Captured with Sony A7R IV, 90mm lens, f/5.6, soft window light, high-resolution, food styling, magazine quality photography",
+    "Artisanal bread and pastries in rustic bakery setting with warm lighting. Photographed with Nikon Z9, 85mm lens, f/3.5, natural lighting, high-resolution, food photography, lifestyle magazine quality",
+    "Elegant dessert presentation with chocolate and berries on fine china. Shot with Canon EOS R6, 105mm macro lens, f/4.5, controlled lighting, high-resolution, food photography, restaurant quality",
+    "Fresh seafood display with lemons and herbs in coastal restaurant setting. Captured with Sony A7R V, 50mm lens, f/6.3, natural lighting, high-resolution, food photography, professional quality"
+  ],
+  people: [
+    "Portrait of diverse professional in natural outdoor setting with soft lighting. Shot with Canon EOS R5, 85mm lens, f/2.8, golden hour light, high-resolution, portrait photography, natural expressions, professional quality",
+    "Candid moment of person laughing in urban environment with street photography style. Captured with Sony A7R IV, 50mm lens, f/4, available light, high-resolution, lifestyle photography, authentic emotion",
+    "Professional headshot with clean background and natural lighting. Photographed with Nikon Z9, 105mm lens, f/5.6, studio lighting, high-resolution, corporate photography, professional quality",
+    "Person reading in cozy cafe with warm ambient lighting and bokeh background. Shot with Canon EOS R6, 50mm lens, f/2.2, natural light, high-resolution, lifestyle photography, intimate moment",
+    "Group of friends enjoying outdoor activity with natural expressions and lighting. Captured with Sony A7R V, 35mm lens, f/6.3, daylight, high-resolution, lifestyle photography, authentic moments"
+  ],
+  travel: [
+    "Breathtaking mountain landscape with dramatic clouds and golden hour lighting. Shot with Canon EOS R5, 16-35mm lens, f/11, natural lighting, high-resolution, landscape photography, professional quality",
+    "Historic city street with charming architecture and local culture. Captured with Sony A7R IV, 24-70mm lens, f/8, available light, high-resolution, travel photography, documentary style",
+    "Tropical beach with crystal clear water and palm trees at sunset. Photographed with Nikon Z9, 14-24mm lens, f/9, golden hour, high-resolution, travel photography, magazine quality",
+    "Ancient temple with intricate details and dramatic lighting. Shot with Canon EOS R6, 70-200mm lens, f/6.3, natural light, high-resolution, travel photography, cultural documentation",
+    "Urban skyline at night with city lights and long exposure technique. Captured with Sony A7R V, 24mm lens, f/16, long exposure, high-resolution, cityscape photography, professional quality"
+  ],
+  abstract: [
+    "Abstract geometric patterns with vibrant colors and dynamic composition. Shot with Canon EOS R5, 50mm lens, f/8, controlled lighting, high-resolution, abstract photography, artistic composition",
+    "Fluid motion captured with long exposure creating ethereal abstract forms. Captured with Sony A7R IV, 85mm lens, f/11, long exposure, high-resolution, abstract photography, artistic expression",
+    "Minimalist abstract composition with negative space and subtle textures. Photographed with Nikon Z9, 105mm lens, f/6.3, natural lighting, high-resolution, abstract art, gallery quality",
+    "Color field abstraction with bold hues and geometric shapes. Shot with Canon EOS R6, 35mm lens, f/9, studio lighting, high-resolution, abstract photography, modern art style",
+    "Textural abstract with organic forms and natural lighting creating depth. Captured with Sony A7R V, 60mm lens, f/7.1, natural light, high-resolution, abstract photography, artistic vision"
+  ],
+  nature: [
+    "Majestic forest with towering trees and dappled sunlight filtering through canopy. Shot with Canon EOS R5, 16-35mm lens, f/11, natural lighting, high-resolution, nature photography, professional quality",
+    "Serene lake reflection with mountains and dramatic sky at golden hour. Captured with Sony A7R IV, 24-70mm lens, f/9, natural light, high-resolution, landscape photography, magazine quality",
+    "Wildflower meadow with vibrant colors and shallow depth of field. Photographed with Nikon Z9, 105mm macro lens, f/4, natural lighting, high-resolution, nature photography, artistic composition",
+    "Waterfall cascading over rocks with long exposure creating silky water effect. Shot with Canon EOS R6, 14-24mm lens, f/16, long exposure, high-resolution, nature photography, professional technique",
+    "Autumn forest with colorful leaves and misty atmosphere creating mood. Captured with Sony A7R V, 70-200mm lens, f/8, natural lighting, high-resolution, nature photography, seasonal beauty"
+  ],
+  technology: [
+    "Modern smartphone with sleek design and premium materials in studio lighting. Shot with Canon EOS R5, 100mm macro lens, f/8, controlled lighting, high-resolution, product photography, professional quality",
+    "Futuristic computer setup with RGB lighting and modern peripherals. Captured with Sony A7R IV, 50mm lens, f/6.3, ambient lighting, high-resolution, tech photography, lifestyle magazine quality",
+    "Abstract circuit board patterns with metallic textures and geometric forms. Photographed with Nikon Z9, 105mm macro lens, f/11, studio lighting, high-resolution, tech photography, artistic composition",
+    "Smart home devices integrated seamlessly into modern living space. Shot with Canon EOS R6, 35mm lens, f/7.1, natural lighting, high-resolution, lifestyle photography, technology integration",
+    "High-tech laboratory with advanced equipment and clean modern design. Captured with Sony A7R V, 24-70mm lens, f/9, professional lighting, high-resolution, tech photography, scientific atmosphere"
+  ],
   lifestyle: [
     "Ultra-realistic photo of a person reading a leather-bound book in a cozy coffee shop corner. Warm golden afternoon light streams through large vintage windows, creating soft bokeh and natural rim lighting. Shot with Canon EOS R5, 85mm f/1.4 lens, shallow depth of field, the background gently blurred with coffee steam and warm wood textures. Cinematic color grading, film grain texture, magazine-quality lifestyle photography",
     "Ultra-realistic photo of a joyful family cooking together in a bright modern kitchen. Golden hour sunlight streams through large windows, creating soft warm highlights and natural shadows. The countertops shine with fresh vegetables, herbs, and colorful ingredients. Parents and children laugh as they chop, stir, and taste food together. Captured with Canon EOS R5, 50mm lens, shallow depth of field, high-resolution, cinematic detail, crisp textures, skin tones natural and vibrant, magazine-quality lifestyle photography",
@@ -499,7 +556,8 @@ async function generateWithDallE(prompt, category, index) {
     }
 
     const data = await response.json();
-    if (data.success && data.image?.url) {
+    
+    if (data.success && data.image && data.image.url) {
       // Download and convert to base64
       const imageResponse = await fetch(data.image.url);
       const imageBuffer = await imageResponse.arrayBuffer();
@@ -507,6 +565,14 @@ async function generateWithDallE(prompt, category, index) {
 
       // Save with unique natural title
       const title = generateUniqueTitle(category, index);
+      
+      // Create slug from title
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9 -]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
       
       const saveResponse = await fetch('http://localhost:3000/api/ai/save', {
         method: 'POST',
@@ -518,7 +584,8 @@ async function generateWithDallE(prompt, category, index) {
           title: title,
           description: `Natural ${category} scene captured with realistic lighting and composition. Generated using GPT-Image-1 model via Azure.`,
           dimensions: { width: 1792, height: 1024 },
-          tags: ['gpt-image-1', 'azure', 'natural', 'realistic', category]
+          tags: ['gpt-image-1', 'azure', 'natural', 'realistic', category],
+          slug: slug
         }),
       });
 
@@ -540,25 +607,26 @@ async function generateWithDallE(prompt, category, index) {
 }
 
 // Generate images for a category
-async function generateForCategory(categoryId, categoryName) {
-  console.log(`\n🎨 Generating natural images for ${categoryName}...`);
-  
+async function generateForCategory(categoryId, categoryName, targetCount, currentCount) {
   const prompts = naturalPrompts[categoryId] || [];
-  const targetCount = Math.min(20, prompts.length);
+  const imagesNeeded = targetCount - currentCount;
   
-  for (let i = 0; i < targetCount; i++) {
-    const prompt = prompts[i];
-    console.log(`   ${i + 1}/${targetCount}: ${prompt.substring(0, 60)}...`);
+  console.log(`\n🎨 Generating ${imagesNeeded} natural images for ${categoryName}...`);
+  console.log(`📊 Current: ${currentCount} images, Target: ${targetCount} images`);
+  
+  for (let i = 0; i < imagesNeeded; i++) {
+    const prompt = prompts[i % prompts.length];
+    console.log(`   ${i + 1}/${imagesNeeded}: ${prompt.substring(0, 60)}...`);
     
     await generateWithDallE(prompt, categoryId, i);
     
     // Small delay between generations
-    if (i < targetCount - 1) {
+    if (i < imagesNeeded - 1) {
       await new Promise(resolve => setTimeout(resolve, 1500));
     }
   }
   
-  console.log(`✨ Completed ${categoryName} - ${targetCount} natural images`);
+  console.log(`✨ Completed ${categoryName} - ${imagesNeeded} new natural images`);
 }
 
 // Main execution
@@ -569,7 +637,7 @@ async function generateAllNaturalImages() {
 
   for (let i = 0; i < missingCategories.length; i++) {
     const category = missingCategories[i];
-    await generateForCategory(category.id, category.name);
+    await generateForCategory(category.id, category.name, category.target, category.current);
     
     // Pause between categories
     if (i < missingCategories.length - 1) {

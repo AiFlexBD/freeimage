@@ -50,8 +50,17 @@ export default function HomePage() {
         const data = await response.json()
         
         if (data.success && data.data) {
-          setFeaturedImages(data.data.images || [])
-          setCategoriesWithImages(data.data.categories || [])
+          const images = data.data.images || []
+          const categories = data.data.categories || []
+          
+          console.log('Homepage data loaded:', {
+            imagesCount: images.length,
+            categoriesCount: categories.length,
+            firstImage: images[0]?.title
+          })
+          
+          setFeaturedImages(images)
+          setCategoriesWithImages(categories)
           
           // Preload category images for better performance
           const imagesToPreload = data.data.categories
@@ -100,24 +109,50 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       {/* Optimized Hero Section */}
       <section className="relative min-h-[80vh] hero-section">
-        {/* Single Optimized Background Image */}
+        {/* Dynamic Image Grid Background */}
         <div className="absolute inset-0">
-          <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(147, 51, 234, 0.8) 25%, rgba(236, 72, 153, 0.8) 50%, rgba(245, 101, 101, 0.8) 75%, rgba(251, 191, 36, 0.8) 100%)`
-            }}
-          >
-            {/* Animated Background Pattern */}
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
-              <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
-              <div className="absolute top-3/4 right-1/4 w-48 h-48 bg-white/5 rounded-full blur-xl"></div>
-              <div className="absolute bottom-1/4 left-1/3 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
-            </div>
-            {/* Enhanced Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30"></div>
+          <div className="w-full h-full grid grid-cols-8 grid-rows-5 gap-0 overflow-hidden">
+            {/* Display first 40 images from featuredImages in a grid */}
+            {Array.from({ length: 40 }).map((_, index) => {
+              const image = featuredImages.length > 0 ? featuredImages[index % featuredImages.length] : null;
+              return (
+                <div key={index} className="relative overflow-hidden">
+                  {image ? (
+                    <img
+                      src={image.thumbnail_url || image.download_url}
+                      alt=""
+                      className="w-full h-full object-cover opacity-75 hover:opacity-90 transition-opacity duration-300"
+                      loading={index < 16 ? "eager" : "lazy"} // Eager load first 2 rows
+                      decoding="async"
+                      onError={(e) => {
+                        // Fallback to gradient if image fails
+                        const target = e.currentTarget;
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-blue-400/40 to-purple-600/40"></div>';
+                        }
+                      }}
+                    />
+                  ) : (
+                    // Placeholder for missing images - more vibrant colors
+                    <div className={`w-full h-full ${
+                      index % 8 === 0 ? 'bg-gradient-to-br from-blue-500/50 to-cyan-500/50' :
+                      index % 8 === 1 ? 'bg-gradient-to-br from-purple-500/50 to-pink-500/50' :
+                      index % 8 === 2 ? 'bg-gradient-to-br from-green-500/50 to-emerald-500/50' :
+                      index % 8 === 3 ? 'bg-gradient-to-br from-orange-500/50 to-red-500/50' :
+                      index % 8 === 4 ? 'bg-gradient-to-br from-indigo-500/50 to-blue-500/50' :
+                      index % 8 === 5 ? 'bg-gradient-to-br from-pink-500/50 to-rose-500/50' :
+                      index % 8 === 6 ? 'bg-gradient-to-br from-teal-500/50 to-green-500/50' :
+                      'bg-gradient-to-br from-amber-500/50 to-orange-500/50'
+                    }`}></div>
+                  )}
+                </div>
+              );
+            })}
           </div>
+          {/* Overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-purple-900/20"></div>
         </div>
         
         {/* Hero Content */}
