@@ -44,6 +44,11 @@ export default function Footer() {
                   Search Images
                 </Link>
               </li>
+              <li>
+                <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">
+                  Blog & Tips
+                </Link>
+              </li>
             </ul>
           </div>
 

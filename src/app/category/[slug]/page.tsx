@@ -7,6 +7,224 @@ import ImageCard from '@/components/ImageCard'
 import FluentLaneAd from '@/components/FluentLaneAd'
 import AdSense from '@/components/AdSense'
 
+// Category-specific content functions
+function getCategoryDescription(categoryName: string): string {
+  const descriptions: Record<string, string> = {
+    'Oil Painted': 'Our oil painted images capture the timeless beauty and rich textures of traditional oil painting techniques. Each image is carefully crafted to evoke the depth, warmth, and artistic mastery that makes oil paintings so captivating.',
+    'Anime': 'Discover stunning anime-style artwork featuring vibrant characters, dynamic scenes, and the distinctive artistic style that anime fans love. Perfect for gaming, manga, and Japanese-inspired designs.',
+    'Space': 'Explore the cosmos with our collection of space and galaxy images. From nebulas and star clusters to planets and cosmic phenomena, these images bring the universe to your creative projects.',
+    'Pixel Art': 'Retro gaming meets modern design with our pixel art collection. These carefully crafted images capture the nostalgic charm of 8-bit and 16-bit graphics while maintaining crisp, modern quality.',
+    'Aesthetic': 'Minimalist, clean, and visually striking aesthetic images perfect for modern design projects. These images focus on simplicity, balance, and visual harmony.',
+    'Lofi Music': 'Chill vibes and cozy atmospheres define our lofi music background collection. Perfect for creating relaxing, study-friendly, or ambient design environments.',
+    'Product': 'Professional product photography and close-up shots perfect for e-commerce, marketing, and commercial use. High-quality images that showcase products in their best light.',
+    'Nature': 'Breathtaking landscapes, wildlife, and natural scenes that bring the beauty of the outdoors to your projects.',
+    'Business': 'Professional business imagery including office environments, corporate settings, and business-related concepts.',
+    'Technology': 'Modern tech imagery featuring devices, digital concepts, and futuristic technology themes.',
+    'Food': 'Delicious food photography perfect for restaurants, recipes, and culinary content.',
+    'Travel': 'Stunning travel destinations and cultural imagery from around the world.',
+    'People': 'Diverse human subjects in various settings and activities.',
+    'Architecture': 'Beautiful buildings, structures, and architectural details.',
+    'Abstract': 'Creative abstract art and non-representational imagery.'
+  }
+  return descriptions[categoryName] || `Our collection of ${categoryName.toLowerCase()} images offers a diverse range of high-quality, professionally generated visuals perfect for your creative projects.`
+}
+
+function getCategoryFeatures(categoryName: string): string[] {
+  const features: Record<string, string[]> = {
+    'Oil Painted': [
+      'Rich, textured brushstrokes and artistic depth',
+      'Classic oil painting color palettes and techniques',
+      'Timeless artistic appeal and sophistication',
+      'High-resolution suitable for large prints',
+      'Unique hand-painted aesthetic'
+    ],
+    'Anime': [
+      'Authentic anime art style and character design',
+      'Vibrant colors and dynamic compositions',
+      'Perfect for gaming and manga projects',
+      'High-quality digital artwork',
+      'Trendy and popular visual style'
+    ],
+    'Space': [
+      'Stunning cosmic phenomena and celestial bodies',
+      'High-resolution space photography quality',
+      'Perfect for sci-fi and astronomy projects',
+      'Vibrant nebulas and star formations',
+      'Inspiring and awe-inspiring imagery'
+    ],
+    'Pixel Art': [
+      'Authentic retro gaming aesthetic',
+      'Crisp, clean pixel-perfect graphics',
+      'Nostalgic 8-bit and 16-bit style',
+      'Perfect for indie games and retro designs',
+      'Scalable without quality loss'
+    ],
+    'Aesthetic': [
+      'Minimalist and clean design principles',
+      'Perfect color harmony and balance',
+      'Modern, trendy visual appeal',
+      'Versatile for various design projects',
+      'Instagram-worthy visual quality'
+    ],
+    'Lofi Music': [
+      'Cozy, relaxing atmosphere and vibes',
+      'Perfect for study and work environments',
+      'Warm, muted color palettes',
+      'Nostalgic and comforting imagery',
+      'Ideal for music and lifestyle content'
+    ],
+    'Product': [
+      'Professional commercial photography quality',
+      'Perfect lighting and composition',
+      'Clean, distraction-free backgrounds',
+      'High-resolution for detailed product views',
+      'E-commerce and marketing ready'
+    ]
+  }
+  return features[categoryName] || [
+    'High-resolution images suitable for print and digital use',
+    '100% royalty-free with no attribution required',
+    'AI-generated for unique, original content',
+    'Regular updates with fresh, trending designs',
+    'Instant download with no registration needed'
+  ]
+}
+
+function getCategoryUseCases(categoryName: string): string[] {
+  const useCases: Record<string, string[]> = {
+    'Oil Painted': [
+      'Art galleries and museum websites',
+      'Fine art prints and posters',
+      'Luxury brand marketing',
+      'Interior design projects',
+      'Art education materials',
+      'Cultural and heritage websites'
+    ],
+    'Anime': [
+      'Gaming websites and apps',
+      'Manga and comic projects',
+      'Anime streaming platforms',
+      'Gaming merchandise',
+      'Social media content',
+      'Fan art and communities'
+    ],
+    'Space': [
+      'Astronomy and science websites',
+      'Sci-fi movie and game projects',
+      'Educational materials',
+      'Space agency websites',
+      'Technology and innovation content',
+      'Inspirational and motivational designs'
+    ],
+    'Pixel Art': [
+      'Indie game development',
+      'Retro gaming websites',
+      'Nostalgic brand campaigns',
+      'Gaming merchandise',
+      'Tech startup branding',
+      'Retro-themed events'
+    ],
+    'Aesthetic': [
+      'Modern lifestyle brands',
+      'Instagram and social media',
+      'Minimalist web design',
+      'Fashion and beauty content',
+      'Wellness and self-care brands',
+      'Contemporary art projects'
+    ],
+    'Lofi Music': [
+      'Music streaming platforms',
+      'Study and productivity apps',
+      'Cafe and restaurant branding',
+      'Lifestyle and wellness content',
+      'Background music videos',
+      'Cozy lifestyle brands'
+    ],
+    'Product': [
+      'E-commerce websites',
+      'Product catalogs',
+      'Marketing campaigns',
+      'Social media advertising',
+      'Print advertisements',
+      'Product packaging design'
+    ]
+  }
+  return useCases[categoryName] || [
+    'Website headers and hero sections',
+    'Social media posts and stories',
+    'Blog post illustrations',
+    'Marketing materials and presentations',
+    'Print designs and publications',
+    'Mobile app interfaces'
+  ]
+}
+
+function getCategoryTips(categoryName: string): string {
+  const tips: Record<string, string> = {
+    'Oil Painted': 'When using oil painted images, consider these artistic principles:',
+    'Anime': 'For anime-style projects, keep these design considerations in mind:',
+    'Space': 'When working with space imagery, consider these cosmic design tips:',
+    'Pixel Art': 'For pixel art projects, remember these retro design principles:',
+    'Aesthetic': 'When creating aesthetic designs, follow these minimalist guidelines:',
+    'Lofi Music': 'For lofi music projects, consider these cozy design elements:',
+    'Product': 'When showcasing products, apply these professional photography principles:'
+  }
+  return tips[categoryName] || `When using ${categoryName.toLowerCase()} images in your projects, consider these design principles:`
+}
+
+function getCategoryTipList(categoryName: string): string[] {
+  const tipLists: Record<string, string[]> = {
+    'Oil Painted': [
+      'Use warm, rich color palettes to complement the oil painting aesthetic',
+      'Consider the texture and brushstroke details in your design',
+      'Pair with elegant, sophisticated typography',
+      'Maintain the artistic integrity of the original painting style'
+    ],
+    'Anime': [
+      'Use bold, vibrant colors that match anime art style',
+      'Consider the dynamic energy and movement in compositions',
+      'Pair with modern, clean typography for contrast',
+      'Maintain the youthful, energetic feel of anime culture'
+    ],
+    'Space': [
+      'Use dark backgrounds to make cosmic elements pop',
+      'Consider the scale and grandeur of space in your layouts',
+      'Pair with futuristic or scientific typography',
+      'Maintain the sense of wonder and exploration'
+    ],
+    'Pixel Art': [
+      'Keep designs clean and simple to match pixel art style',
+      'Use limited color palettes for authentic retro feel',
+      'Consider the grid-based nature of pixel art',
+      'Maintain the nostalgic, gaming-inspired aesthetic'
+    ],
+    'Aesthetic': [
+      'Use plenty of white space for clean, minimal look',
+      'Stick to muted, harmonious color palettes',
+      'Choose simple, elegant typography',
+      'Focus on balance and visual harmony'
+    ],
+    'Lofi Music': [
+      'Use warm, muted tones for cozy atmosphere',
+      'Consider soft, rounded design elements',
+      'Pair with handwritten or casual typography',
+      'Maintain the relaxed, comfortable vibe'
+    ],
+    'Product': [
+      'Ensure clean, distraction-free backgrounds',
+      'Use consistent lighting and shadows',
+      'Maintain high resolution for detailed views',
+      'Consider the product\'s target audience and brand'
+    ]
+  }
+  return tipLists[categoryName] || [
+    'Maintain consistent color schemes across your design',
+    'Use images that complement your brand\'s aesthetic',
+    'Ensure proper contrast for text overlays',
+    'Consider the emotional impact of your chosen images'
+  ]
+}
+
 interface DatabaseImage {
   id: string
   title: string
@@ -279,6 +497,58 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
                 </span>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Category Content */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="prose prose-lg max-w-none text-gray-600">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Discover High-Quality {category.name} Images
+            </h2>
+            <p className="mb-6">
+              {getCategoryDescription(category.name)}
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-gray-50 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  ✨ Why Choose Our {category.name} Images?
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  {getCategoryFeatures(category.name).map((feature, index) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  🎯 Perfect For
+                </h3>
+                <ul className="space-y-2 text-sm">
+                  {getCategoryUseCases(category.name).map((useCase, index) => (
+                    <li key={index}>• {useCase}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-blue-900 mb-3">
+                💡 Pro Design Tips
+              </h3>
+              <p className="text-blue-800 text-sm mb-3">
+                {getCategoryTips(category.name)}
+              </p>
+              <ul className="text-blue-800 text-sm space-y-1">
+                {getCategoryTipList(category.name).map((tip, index) => (
+                  <li key={index}>• {tip}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>

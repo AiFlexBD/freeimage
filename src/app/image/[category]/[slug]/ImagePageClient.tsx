@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { categories } from '@/data/categories'
 import ImageCard from '@/components/ImageCard'
-import FluentLaneAd from '@/components/FluentLaneAd'
+// Removed intrusive FluentLane ad
 
 interface DatabaseImage {
   id: string
@@ -204,10 +204,7 @@ export default function ImagePageClient({ params }: { params: { category: string
               </div>
             </div>
 
-            {/* FluentLane Ad Card - Below Image */}
-            <div className="mt-8">
-              <FluentLaneAd variant="card" />
-            </div>
+            {/* Clean layout without intrusive ads */}
           </div>
 
           {/* Image Info */}
@@ -296,9 +293,98 @@ export default function ImagePageClient({ params }: { params: { category: string
           </div>
         </div>
 
+        {/* Enhanced Content Section */}
+        <div className="mt-12 bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            About This {category?.name || 'Image'} Category
+          </h2>
+          
+          <div className="prose prose-lg max-w-none text-gray-600">
+            <p className="mb-4">
+              This high-quality {category?.name?.toLowerCase() || 'image'} is perfect for a wide range of creative projects. 
+              Whether you're designing a website, creating marketing materials, or working on a personal project, 
+              this image provides the visual impact you need.
+            </p>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Usage Ideas</h3>
+            <ul className="list-disc list-inside mb-6 space-y-2">
+              <li>Website headers and hero sections</li>
+              <li>Social media posts and stories</li>
+              <li>Blog post illustrations</li>
+              <li>Marketing materials and presentations</li>
+              <li>Print designs and publications</li>
+              <li>Mobile app interfaces</li>
+            </ul>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Technical Specifications</h3>
+            <p className="mb-4">
+              This image is available in high resolution ({image.width} × {image.height} pixels), 
+              making it suitable for both digital and print applications. The file is optimized for 
+              fast loading while maintaining excellent visual quality.
+            </p>
+            
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">License Information</h3>
+            <p className="mb-4">
+              This image is provided under our free license, allowing you to use it for both 
+              personal and commercial projects without attribution requirements. You can download, 
+              modify, and distribute this image freely.
+            </p>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+              <h4 className="font-semibold text-blue-900 mb-2">💡 Pro Tip</h4>
+              <p className="text-blue-800 text-sm">
+                For best results, consider the image's composition and colors when incorporating 
+                it into your design. This {category?.name?.toLowerCase() || 'image'} works 
+                particularly well with modern, clean design aesthetics.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Related Resources */}
+        <div className="mt-8 bg-white rounded-lg shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            Related Resources
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                📚 Design Tips
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Learn how to effectively use {category?.name?.toLowerCase() || 'images'} 
+                in your creative projects with our comprehensive design guides.
+              </p>
+              <Link 
+                href="/blog"
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Read Design Tips →
+              </Link>
+            </div>
+            
+            <div className="border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                🎨 More {category?.name || 'Images'}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Explore our complete collection of {category?.name?.toLowerCase() || 'images'} 
+                to find the perfect visual for your next project.
+              </p>
+              <Link 
+                href={`/category/${category?.slug || params.category}`}
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Browse Category →
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Related Images */}
         {relatedImages.length > 0 && (
-          <div className="mt-16">
+          <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">
               More {category?.name} Images
             </h2>
