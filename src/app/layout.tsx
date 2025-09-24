@@ -5,8 +5,16 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { AdSenseInit } from '@/components/AdSense'
 import FluentLaneAd from '@/components/FluentLaneAd'
+import PerformanceLayout from '@/components/PerformanceLayout'
+import PerformanceMonitor from '@/components/PerformanceMonitor'
 
-const inter = Inter({ subsets: ['latin'] })
+// Optimize font loading for better LCP
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial']
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://imagegenfree.com'),
@@ -170,10 +178,14 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        <link rel="dns-prefetch" href="https://dqlxsrxjncpvjjzkgtek.supabase.co" />
         
-        {/* Google AdSense Script - Always load for verification */}
+        {/* Critical resource hints */}
+        <link rel="preload" href="/api/images" as="fetch" crossOrigin="anonymous" />
+        
+        {/* Google AdSense Script - Defer for better performance */}
         <script 
-          async 
+          defer
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3416527767689571"
           crossOrigin="anonymous"
         />
@@ -182,14 +194,15 @@ export default function RootLayout({
         <ServiceWorkerRegistration />
       </head>
       <body className={inter.className}>
-        <div className="min-h-screen flex flex-col">
+        <PerformanceLayout>
           <Header />
           <main className="flex-1">
             {children}
           </main>
           <Footer />
           <FluentLaneAd variant="floating" />
-        </div>
+          <PerformanceMonitor />
+        </PerformanceLayout>
       </body>
     </html>
   )
