@@ -10,11 +10,17 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const includeImageCount = searchParams.get('includeImageCount') === 'true'
+    const slug = searchParams.get('slug')
     
     let query = supabase
       .from('categories')
       .select('*')
       .order('sort_order', { ascending: true })
+    
+    // If slug is provided, filter by slug
+    if (slug) {
+      query = query.eq('slug', slug)
+    }
     
     // If we need image counts, we'll need to join with images table
     if (includeImageCount) {
@@ -25,6 +31,10 @@ export async function GET(request: NextRequest) {
           images(count)
         `)
         .order('sort_order', { ascending: true })
+      
+      if (slug) {
+        query = query.eq('slug', slug)
+      }
     }
     
     const { data: categories, error } = await query
@@ -50,6 +60,23 @@ export async function GET(request: NextRequest) {
       updated_at: category.updated_at
     })) || []
     
+    // If slug was provided, return single category with success wrapper
+    if (slug) {
+      const category = transformedCategories[0]
+      if (category) {
+        return NextResponse.json({
+          success: true,
+          category: category
+        })
+      } else {
+        return NextResponse.json({
+          success: false,
+          error: 'Category not found'
+        }, { status: 404 })
+      }
+    }
+    
+    // Otherwise return all categories
     return NextResponse.json(transformedCategories)
     
   } catch (error) {

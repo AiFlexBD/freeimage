@@ -23,12 +23,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
-    {
-      url: `${baseUrl}/generate`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
   ]
 
   // Category pages
@@ -52,7 +46,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'photography-composition-tips',
     'image-licensing-guide',
     'design-trends-2024',
-    'color-theory-basics'
+    'color-theory-basics',
+    'ai-prompt-generation-techniques'
   ]
 
   const blogPages = blogPosts.map(post => ({

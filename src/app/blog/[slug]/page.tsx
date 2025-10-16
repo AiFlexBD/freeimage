@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Metadata } from 'next';
 
 interface BlogPost {
   id: string;
@@ -372,18 +373,45 @@ Remember: optimization is an ongoing process. Regularly audit your images and up
   }
 };
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+// Generate static params for all blog posts
+export async function generateStaticParams() {
+  return Object.keys(blogPosts).map((slug) => ({
+    slug: slug,
+  }));
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = blogPosts[params.slug];
   
   if (!post) {
     return {
-      title: 'Post Not Found',
+      title: 'Blog Post Not Found',
+      description: 'The requested blog post could not be found.',
     };
   }
 
   return {
     title: post.title,
     description: post.excerpt,
+    keywords: post.tags,
+    authors: [{ name: 'ImageGenFree Team' }],
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: 'article',
+      publishedTime: post.date,
+      authors: ['ImageGenFree Team'],
+      tags: post.tags,
+      url: `https://imagegenfree.com/blog/${post.id}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+    },
+    alternates: {
+      canonical: `https://imagegenfree.com/blog/${post.id}`,
+    },
   };
 }
 
@@ -394,8 +422,43 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     notFound();
   }
 
+  // Structured data for the blog post
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt,
+    "image": `https://imagegenfree.com/blog/${post.id}/og-image.jpg`,
+    "author": {
+      "@type": "Organization",
+      "name": "ImageGenFree Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "ImageGenFree",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://imagegenfree.com/logo.png"
+      }
+    },
+    "datePublished": post.date,
+    "dateModified": post.date,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://imagegenfree.com/blog/${post.id}`
+    },
+    "keywords": post.tags.join(", "),
+    "articleSection": post.category,
+    "wordCount": post.content.split(' ').length
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="max-w-4xl mx-auto px-6 py-12">
         <nav className="mb-8">
           <Link href="/blog" className="text-blue-600 hover:text-blue-800 font-medium">

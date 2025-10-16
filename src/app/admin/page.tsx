@@ -236,14 +236,6 @@ export default function AdminDashboard() {
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link
-              href="/admin/ai-generator"
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-center"
-            >
-              <div className="text-2xl mb-2">🎨</div>
-              <h3 className="text-lg font-semibold mb-2">Generate AI Images</h3>
-              <p className="text-blue-100 text-sm">Create new AI-generated images using Gemini</p>
-            </Link>
             
             <button
               onClick={() => window.open('/', '_blank')}

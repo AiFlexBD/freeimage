@@ -61,7 +61,7 @@ export async function GET() {
       stats[image.category_id] = (stats[image.category_id] || 0) + 1
     })
 
-    // Combine category data
+    // Combine category data - show all categories, not just those with images
     const categoriesWithImages = categories.map(category => {
       const imageCount = stats[category.id] || 0
       const featuredImage = featuredImages[category.id] || null
@@ -71,7 +71,26 @@ export async function GET() {
         imageCount,
         featuredImage
       }
-    }).filter(category => category.imageCount > 0)
+    })
+
+    // Sort categories to prioritize stunning ones and those with images
+    const stunningCategories = ['anime', 'space', 'pixel-art', 'aesthetic', 'medieval', 'music', 'lofi-music']
+    
+    categoriesWithImages.sort((a, b) => {
+      // First priority: stunning categories
+      const aIsStunning = stunningCategories.includes(a.id)
+      const bIsStunning = stunningCategories.includes(b.id)
+      
+      if (aIsStunning && !bIsStunning) return -1
+      if (!aIsStunning && bIsStunning) return 1
+      
+      // Second priority: categories with images
+      if (a.imageCount > 0 && b.imageCount === 0) return -1
+      if (a.imageCount === 0 && b.imageCount > 0) return 1
+      
+      // Third priority: image count (descending)
+      return b.imageCount - a.imageCount
+    })
 
     const response = NextResponse.json({
       success: true,
@@ -112,7 +131,7 @@ async function getFeaturedImagesOptimized(): Promise<{ [key: string]: any }> {
     const uniqueCategories = Array.from(new Set(categoryData.map(c => c.category_id)))
 
     // Get first image for each category in parallel
-    const featuredPromises = uniqueCategories.slice(0, 10).map(async (categoryId) => {
+    const featuredPromises = uniqueCategories.map(async (categoryId) => {
       const { data } = await supabase
         .from('images')
         .select('id, title, download_url, thumbnail_url, category_id, created_at')

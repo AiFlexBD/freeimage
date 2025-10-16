@@ -217,12 +217,6 @@ export default function HomePage() {
               >
                 Browse Categories
               </button>
-              <button
-                onClick={() => router.push('/generate')}
-                className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full font-semibold text-lg hover:from-yellow-500 hover:to-orange-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                🎨 Create AI Image
-              </button>
             </div>
           </div>
         </div>
@@ -249,7 +243,7 @@ export default function HomePage() {
 
           {categoriesWithImages.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {categoriesWithImages.slice(0, 8).map((category) => (
+              {categoriesWithImages.slice(0, 12).map((category) => (
                 <div
                   key={category.id}
                   onClick={() => router.push(`/category/${category.slug}`)}
@@ -263,24 +257,40 @@ export default function HomePage() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         loading={category.imageCount <= 4 ? "eager" : "lazy"} // Eager load first 4 categories
                         decoding="async"
+                        crossOrigin="anonymous"
                         onError={(e) => {
                           // Fallback to original URL on error
                           const target = e.target as HTMLImageElement
-                          const originalUrl = category.featuredImage?.thumbnail_url || category.featuredImage?.download_url
+                          const originalUrl = category.featuredImage?.download_url
                           if (originalUrl && target.src !== originalUrl) {
                             target.src = originalUrl
                           } else {
+                            // Show placeholder if image fails to load
                             target.style.display = 'none'
+                            const placeholder = target.parentElement?.querySelector('.image-placeholder')
+                            if (placeholder) {
+                              (placeholder as HTMLElement).style.display = 'flex'
+                            }
+                          }
+                        }}
+                        onLoad={(e) => {
+                          // Hide placeholder when image loads successfully
+                          const target = e.target as HTMLImageElement
+                          const placeholder = target.parentElement?.querySelector('.image-placeholder')
+                          if (placeholder) {
+                            (placeholder as HTMLElement).style.display = 'none'
                           }
                         }}
                       />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                    )}
+                    ) : null}
+                    
+                    {/* Always show placeholder as fallback */}
+                    <div className="image-placeholder absolute inset-0 w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                      <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
                   </div>
                   <div className="p-4">
@@ -303,9 +313,9 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <button
               onClick={() => router.push('/categories')}
-              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              View All Categories
+              View All {categoriesWithImages.length} Categories
             </button>
           </div>
         </div>

@@ -195,6 +195,46 @@ export default function ImagePageClient({ params }: { params: { category: string
                   src={image.download_url}
                   alt={image.title}
                   className="w-full h-auto object-contain max-h-[600px]"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement
+                    console.error('Image failed to load:', image.download_url)
+                    target.style.display = 'none'
+                    
+                    // Show error message
+                    const errorDiv = document.createElement('div')
+                    errorDiv.className = 'w-full h-64 bg-gray-100 flex items-center justify-center text-gray-500'
+                    errorDiv.innerHTML = `
+                      <div class="text-center">
+                        <svg class="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <p class="text-sm">Image failed to load</p>
+                        <p class="text-xs text-gray-400 mt-1">This image may be corrupted or unavailable</p>
+                      </div>
+                    `
+                    target.parentNode?.insertBefore(errorDiv, target.nextSibling)
+                  }}
+                  onLoad={(e) => {
+                    const target = e.target as HTMLImageElement
+                    // Check if image is too small (likely corrupted)
+                    if (target.naturalWidth <= 1 || target.naturalHeight <= 1) {
+                      console.warn('Image appears to be corrupted (1x1 pixel):', image.download_url)
+                      target.style.display = 'none'
+                      
+                      const errorDiv = document.createElement('div')
+                      errorDiv.className = 'w-full h-64 bg-gray-100 flex items-center justify-center text-gray-500'
+                      errorDiv.innerHTML = `
+                        <div class="text-center">
+                          <svg class="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                          </svg>
+                          <p class="text-sm">Image appears to be corrupted</p>
+                          <p class="text-xs text-gray-400 mt-1">This image is only 1x1 pixel and may be a placeholder</p>
+                        </div>
+                      `
+                      target.parentNode?.insertBefore(errorDiv, target.nextSibling)
+                    }
+                  }}
                 />
                 {image.tags?.includes('ai-generated') && (
                   <div className="absolute top-4 right-4 bg-purple-600 text-white text-sm px-3 py-1 rounded-full">

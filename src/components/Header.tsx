@@ -57,11 +57,10 @@ export default function Header() {
               Blog
             </Link>
             <Link 
-              href="/generate" 
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2.5 rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 flex items-center space-x-2"
+              href="/about" 
+              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 hover:scale-105"
             >
-              <span>🎨</span>
-              <span>AI Generator</span>
+              About
             </Link>
           </nav>
 
@@ -134,11 +133,11 @@ export default function Header() {
                   Blog
                 </Link>
                 <Link 
-                  href="/generate" 
-                  className="block px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold text-center shadow-lg"
+                  href="/about" 
+                  className="block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  🎨 AI Generator
+                  About
                 </Link>
               </div>
               

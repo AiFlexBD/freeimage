@@ -57,6 +57,21 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Legal & Support</h3>
             <ul className="space-y-2">
               <li>
+                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-gray-300 hover:text-white transition-colors">
+                  FAQ
+                </Link>
+              </li>
+              <li>
                 <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">
                   Terms of Use
                 </Link>
@@ -67,14 +82,9 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@freeimage.com" className="text-gray-300 hover:text-white transition-colors">
-                  Contact Support
-                </a>
-              </li>
-              <li>
-                <a href="mailto:legal@freeimage.com" className="text-gray-300 hover:text-white transition-colors">
-                  Legal Inquiries
-                </a>
+                <Link href="/dmca" className="text-gray-300 hover:text-white transition-colors">
+                  DMCA Policy
+                </Link>
               </li>
             </ul>
           </div>

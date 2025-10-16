@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { categories } from '@/data/categories'
 import OptimizedImageCard from '@/components/OptimizedImageCard'
@@ -166,7 +166,7 @@ interface Category {
   imageCount: number
 }
 
-export default function CategoryPage({ params }: { params: { slug: string } }) {
+export default function OptimizedCategoryPage({ params }: { params: { slug: string } }) {
   const [category, setCategory] = useState<Category | null>(null)
   const [images, setImages] = useState<DatabaseImage[]>([])
   const [loading, setLoading] = useState(true)
@@ -174,8 +174,6 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const loadingRef = useRef(false)
-  const [autoLoadEnabled, setAutoLoadEnabled] = useState(true)
 
   // Memoize category data to prevent unnecessary re-renders
   const categoryData = useMemo(() => {
@@ -209,19 +207,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       if (response.ok) {
         const data = await response.json()
         if (data.success && data.category) {
-          // Get real image count from images API
-          const imagesResponse = await fetch(`/api/images?category=${data.category.id}&page=1&limit=1`)
-          if (imagesResponse.ok) {
-            const imagesData = await imagesResponse.json()
-            const realImageCount = imagesData.count || 0
-            
-            setCategory({
-              ...data.category,
-              imageCount: realImageCount
-            })
-          } else {
-            setCategory(data.category)
-          }
+          setCategory(data.category)
         } else {
           setError('Category not found')
         }
@@ -242,19 +228,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         setLoadingMore(true)
       }
       
-      // Add timeout and retry logic
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
-      
-      const response = await fetch(`/api/images?category=${category.id}&page=${pageNum}&limit=${pageNum === 1 ? 20 : 20}`, {
-        signal: controller.signal,
-        headers: {
-          'Cache-Control': 'max-age=300' // 5 minute cache
-        }
-      })
-      
-      clearTimeout(timeoutId)
-      
+      const response = await fetch(`/api/images?category=${category.id}&page=${pageNum}&limit=20`)
       if (response.ok) {
         const data = await response.json()
         if (data.success && data.images) {
@@ -265,15 +239,9 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
           }
           setHasMore(data.images.length === 20)
         }
-      } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
     } catch (err) {
       console.error('Error fetching images:', err)
-      if (err instanceof Error && err.name === 'AbortError') {
-        console.log('Request was aborted due to timeout')
-      }
-      // Don't set error state for individual page failures, just log them
     } finally {
       if (append) {
         setLoadingMore(false)
@@ -282,57 +250,24 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
   }, [category])
 
   const loadMore = useCallback(() => {
-    if (!loadingMore && hasMore && category) {
+    if (!loadingMore && hasMore) {
       const nextPage = page + 1
       setPage(nextPage)
-      // Add a small delay to prevent overwhelming the server
-      setTimeout(() => {
-        fetchImages(nextPage, true)
-      }, 100)
+      fetchImages(nextPage, true)
     }
-  }, [page, loadingMore, hasMore, category, fetchImages])
+  }, [page, fetchImages, loadingMore, hasMore])
 
   useEffect(() => {
-    if (loadingRef.current) return // Prevent multiple simultaneous loads
-    
     const loadData = async () => {
-      loadingRef.current = true
       setLoading(true)
-      setError('')
-      setImages([])
-      setPage(1)
-      setHasMore(true)
-      
-      try {
-        // Load category first, then images sequentially to reduce load
-        await fetchCategory()
-        // Small delay before loading images
-        await new Promise(resolve => setTimeout(resolve, 200))
-        await fetchImages(1, false)
-      } catch (err) {
-        console.error('Error loading category data:', err)
-        setError('Failed to load category data')
-      } finally {
-        setLoading(false)
-        loadingRef.current = false
-      }
+      await Promise.all([
+        fetchCategory(),
+        fetchImages(1, false)
+      ])
+      setLoading(false)
     }
     loadData()
-  }, [params.slug]) // Only depend on the slug parameter
-
-  // Infinite scroll effect
-  useEffect(() => {
-    if (!autoLoadEnabled || !hasMore || loadingMore) return
-
-    const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1000) {
-        loadMore()
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [autoLoadEnabled, hasMore, loadingMore, loadMore])
+  }, [fetchCategory, fetchImages])
 
   if (loading) {
     return (
@@ -399,40 +334,21 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
 
             {/* Load More Button */}
             {hasMore && (
-              <div className="text-center mt-12 space-y-4">
-                <div className="flex items-center justify-center space-x-4">
-                  <button
-                    onClick={loadMore}
-                    disabled={loadingMore}
-                    className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {loadingMore ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Loading...</span>
-                      </div>
-                    ) : (
-                      'Load More Images'
-                    )}
-                  </button>
-                  
-                  <button
-                    onClick={() => setAutoLoadEnabled(!autoLoadEnabled)}
-                    className={`px-4 py-2 rounded-lg border transition-colors ${
-                      autoLoadEnabled 
-                        ? 'bg-green-100 border-green-300 text-green-700 hover:bg-green-200' 
-                        : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {autoLoadEnabled ? 'Auto-load ON' : 'Auto-load OFF'}
-                  </button>
-                </div>
-                
-                {autoLoadEnabled && (
-                  <p className="text-sm text-gray-500">
-                    Images will load automatically as you scroll down
-                  </p>
-                )}
+              <div className="text-center mt-12">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loadingMore ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    'Load More Images'
+                  )}
+                </button>
               </div>
             )}
 
